@@ -77,6 +77,5 @@ Since DNS is typically more permanent than individual web hosts and the text fil
 - Searching "how to add TXT records to DNS" in combination with your DNS provider or system will help you.
 
 ---
-
-Copyright disclose.io 2021.  
+ 
 Created with <3 by [John Carroll](https://twitter.com/yosignals) and [Casey Ellis](https://twitter.com/caseyjohnellis) for [The disclose.io Project](https://disclose.io).   
