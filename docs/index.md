@@ -1,8 +1,15 @@
+# dnssecuritytxt 
+A standard allowing organizations to nominate security contact points and policies via DNS TXT records.  
+
+Find us on Twitter: [https://twitter.com/dnssecuritytxt](https://twitter.com/dnssecuritytxt).  
+
 ## Summary  
 
 When people find security issues in Internet-facing systems, the correct channel to report security issues isn't always clear. The relevant vulnerability reporting and disclosure policy for the system isn't always apparent. The DNS Security TXT standard extends the work done by security.txt to simplify answering this question by taking advantage of DNS, arguably the most ubiquitous system on the Internet.
 
-When deployed, it provides security researchers, Internauts, and concerned Internet citizens with clear and authoritative direction towards the correct channels for reporting security issues and the governing policies set out by an organization for all systems under a domain.
+When deployed, it provides security researchers, Internauts, and concerned Internet citizens with clear and authoritative direction towards the correct channels for reporting security issues and the governing policies set out by an organization for all systems under a domain.  
+
+![DNS Text Screencap for disclose.io](/docs/dnssecuritytxt.png)
 
 ## Why?  
 
@@ -38,18 +45,18 @@ DNS is core to the Internet's operation, and interrogating DNS is a fundamental 
   - Examples:
     - https://domain.com/security
     - https://bugcrowd.com/domain
-- _Note: The maximum number of characters in a TXT record is 255 characters per https://www.freesoft.org/CIE/RFC/1035/9.htm._
+- _Note: The maximum number of characters in a TXT record is 255 characters per https://www.freesoft.org/CIE/RFC/1035/9.htm.
 
 ## Frequently Asked Questions
-**Is this a replacement for security.txt?**  
-- It can be, but it doesn't need to be - security.txt can work well for individual hosts or hosts which are only addressable via an IP address, with DNS Security TXT providing directions for the parent domain.
+**Is this a replacement for [security.txt](https://securitytxt.org)?**  
+- It can be, but it doesn't need to be - security.txt can work well for individual hosts or hosts which are only addressable via an IP address, with DNS Security TXT providing directions from the parent domain.
 - If there is a discrepancy between a parent DNS Security TXT records and a security.txt file, and DNS Security TXT record should prevail.
 Since DNS is typically more permanent than individual web hosts and the text files they hold, a DNS Security TXT record is more authoritative.
 
 **Is this giving anyone permission to hack my organization?**  
 - No, this provides a place for people to send security reports if they find something. 
 - We recommend creating and pointing to a security_policy in combination with the security_contact to lay out expectations and rules of engagement for security researchers who wish to conduct proactive research. 
-- The disclose.io dioterms repository provides simple boilerplates with a variety of options to get you started.
+- [The disclose.io dioterms repository](https://github.com/disclose/dioterms) provides simple boilerplates with a variety of options to get you started.
 
 **Can I deploy this on a subdomain?**  
 - Yes! While we strongly recommend assigning the TXT record to the root domain of an organization, we've created the standard in a way that supports subdomains and even hosts if required. 
@@ -69,9 +76,5 @@ Since DNS is typically more permanent than individual web hosts and the text fil
 
 ---
 
-# dnssecuritytxt. 
-A standard allowing organizations to nominate security contact points and policies via DNS TXT records.  
 Copyright disclose.io 2021.  
-
-Find us on Twitter: [https://twitter.com/dnssecuritytxt](https://twitter.com/dnssecuritytxt).  
-Created with <3 by [John Carroll](https://twitter.com/yosignals) and [Casey Ellis](https://twitter.com/caseyjohnellis) for [The disclose.io Project](https://disclose.io).
+Created with <3 by [John Carroll](https://twitter.com/yosignals) and [Casey Ellis](https://twitter.com/caseyjohnellis) for [The disclose.io Project](https://disclose.io).   
