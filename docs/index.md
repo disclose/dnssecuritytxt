@@ -47,7 +47,7 @@ DNS is core to the Internet's operation, and interrogating DNS is a fundamental 
   - Examples:
     - https://domain.com/security
     - https://bugcrowd.com/domain
-- _Note: The maximum number of characters in a TXT record is 255 characters per https://www.freesoft.org/CIE/RFC/1035/9.htm.
+- _Note:_ The maximum number of characters in a TXT record is 255 characters per https://www.freesoft.org/CIE/RFC/1035/9.htm.
 
 ## Frequently Asked Questions
 **Is this a replacement for [security.txt](https://securitytxt.org)?**  
