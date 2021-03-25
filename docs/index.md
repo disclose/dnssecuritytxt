@@ -9,7 +9,7 @@ When people find security issues in Internet-facing systems, the correct channel
 
 When deployed, it provides security researchers, Internauts, and concerned Internet citizens with clear and authoritative direction towards the correct channels for reporting security issues and the governing policies set out by an organization for all systems under a domain.  
 
-![DNS Text Screencap for disclose.io](/docs/dnssecuritytxt.png)
+![DNS Text Screencap for disclose.io](/dnssecuritytxt.png)
 
 ## Why?  
 
