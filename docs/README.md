@@ -43,7 +43,8 @@ DNS is core to the Internet's operation, and interrogating DNS is a fundamental 
     - https://bugcrowd.com/domain/report
     - mailto:security@domain.com
 - **security_policy (Optional)**
-  - A link to a policy detailing what finders should expect when reporting via the contact channels, and what security researchers should do when searching for security issues. Remember to include ''https://''. 
+  - A link to a policy detailing what finders should expect when reporting via the contact channels, and what security researchers should do when searching for security issues. 
+  - Please include ''https://''. 
   - Examples:
     - https://domain.com/security
     - https://bugcrowd.com/domain
