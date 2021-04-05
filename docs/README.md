@@ -50,19 +50,19 @@ DNS is core to the Internet's operation, and interrogating DNS is a fundamental 
     - https://bugcrowd.com/domain
 - _Note: The maximum number of characters in a TXT record is 255 characters per https://www.freesoft.org/CIE/RFC/1035/9.htm._
 
-**Deployment Options**
+## Deployment Options
 
 Just as security.txt can be deployed into either the root or the .well-known directory of a webserver, DNS Security TXT can be deployed to either the apex of a domain, or under a specially created \_security.domain.com subdomain. This approach allows organizations to decide the approach that suits them best.
 
-***Apex approach***
+### Apex approach
 
-Pros:
+**Pros:**
 - Obvious and familiar to users 
 - Easy to find
 - Resilient 
 - Greater authority on behalf of the domain and it's owner  
 
-Cons:
+**Cons:**
 - Additional TXT records in domain apex 
 - Not conducive to additional options
 
@@ -74,13 +74,13 @@ Cons:
 | Direct policy URL | \_security.domain.com | TXT | "security_policy=https://domain.com/security-policy" | 
 | 3rd party web form reporting URL | \_security.domain.com | TXT | "security_policy=https://bugcrowd.com/domain" |
 
-***\_security.domain.com approach***
+### \_security.domain.com approach***
 
-Pros:
+**Pros:**
 - Maintains apex zone hygiene
 - Better support for additional future options without cluttering the apex  
 
-Cons:
+**Cons:**
 - Not as visible in the apex
 - Users require knowledge of dnssecuritytxt and/or the \_security.domain.com subdomain
 
@@ -93,7 +93,7 @@ Cons:
 | 3rd party web form reporting URL | \_security.domain.com | TXT | "security_policy=https://bugcrowd.com/domain" |
 
 ## Frequently Asked Questions**
-Is this a replacement for [security.txt](https://securitytxt.org)?**  
+Is this a replacement for [security.txt](https://securitytxt.org)?  
 - It can be, but it doesn't need to be - security.txt can work well for individual hosts or hosts which are only addressable via an IP address, with DNS Security TXT providing directions from the parent domain.
 - If there is a discrepancy between a parent DNS Security TXT records and a security.txt file, and DNS Security TXT record should prevail.
 Since DNS is typically more permanent than individual web hosts and the text files they hold, a DNS Security TXT record is more authoritative.
@@ -105,7 +105,7 @@ Since DNS is typically more permanent than individual web hosts and the text fil
 
 **Can I deploy this on a subdomain?**  
 - Yes! While we strongly recommend assigning the TXT record to the root domain of an organization, we've created the standard in a way that supports subdomains and even hosts if required. 
-- This is useful if contact or policy details are different across different departments, or if a specific department has a vulnearbility disclosure policy but the parent organization does not.  
+- This is useful if contact or policy details are different across different departments, or if a specific department has a vulnerability disclosure policy but the parent organization does not.  
 
 **Who in my organization do I need to engage with to get these records in place?**
 - This will depend on the size of your organization and who is responsible for maintaining DNS. 
@@ -115,8 +115,7 @@ Since DNS is typically more permanent than individual web hosts and the text fil
 - Email is optional as a field. 
 - If you are worried about unsolicited email, set a URI as the value and link to your security policy and web form for issue reporting.
 
-**Where do I put these entries?**  
-- In your DNS… :) 
+**How do I put these entries into my DNS?**  
 - Searching "how to add TXT records to DNS" in combination with your DNS provider or system will help you.
 
 ---
