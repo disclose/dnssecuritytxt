@@ -21,7 +21,7 @@ It is common practice to use DNS TXT to establish authorization from a domain. A
 
 DNS records speak on behalf of the organization and not just an individual server or application owner. Pairing security reporting and policy information with the authoritative nature of DNS creates confidence in the information provided. 
 
-This attribute of DNS TXT records makes them a suitable place to confirm, on behalf of the organization, good-faith towards security reports or authorization for testing - This permission to authorize is a core enabler for safe harbor for security researchers.
+This attribute of DNS TXT records makes them a suitable place to confirm, on behalf of the organization, good-faith towards security reports or authorization for testing (this permission to authorize is a core enabler for safe harbor for security researchers), and clear instructions about where security issues should be sent.
 
 ### Centralized  
 
@@ -43,14 +43,57 @@ DNS is core to the Internet's operation, and interrogating DNS is a fundamental 
     - https://bugcrowd.com/domain/report
     - mailto:security@domain.com
 - **security_policy (Optional)**
-  - A link to a policy detailing what finders should expect when reporting via the contact channels, and what security researchers should do when searching for security issues. Remember to include ''https://''. 
+  - A link to a policy detailing what finders should expect when reporting via the contact channels, and what security researchers should do when searching for security issues. 
+  - Please include ''https://''. 
   - Examples:
     - https://domain.com/security
     - https://bugcrowd.com/domain
-- _Note:_ The maximum number of characters in a TXT record is 255 characters per https://www.freesoft.org/CIE/RFC/1035/9.htm.
+- _Note: The maximum number of characters in a TXT record is 255 characters per https://www.freesoft.org/CIE/RFC/1035/9.htm._
 
-## Frequently Asked Questions
-**Is this a replacement for [security.txt](https://securitytxt.org)?**  
+## Deployment Options
+
+Just as security.txt can be deployed into either the root or the .well-known directory of a webserver, DNS Security TXT can be deployed to either the apex of a domain, or under a specially created \_security.domain.com subdomain. This approach allows organizations to decide the approach that suits them best.
+
+### Apex approach
+
+**Pros:**
+- Obvious and familiar to users 
+- Easy to find
+- Resilient 
+- Greater authority on behalf of the domain and it's owner  
+
+**Cons:**
+- Additional TXT records in domain apex 
+- Not conducive to additional options
+
+| Description | Domain | Type | Content |
+|---|---|---|---|
+| Direct email reporting contact | \_security.domain.com | TXT | "security_contact=mailto:security@domain.com" |
+| Direct web form reporting contact | \_security.domain.com | TXT | "security_contact=https://domain.com/report-security-issue" |
+| 3rd party web form reporting contact | \_security.domain.com | TXT | "security_contact=https://bugcrowd.com/domain/report" | 
+| Direct policy URL | \_security.domain.com | TXT | "security_policy=https://domain.com/security-policy" | 
+| 3rd party web form reporting URL | \_security.domain.com | TXT | "security_policy=https://bugcrowd.com/domain" |
+
+### \_security.domain.com approach***
+
+**Pros:**
+- Maintains apex zone hygiene
+- Better support for additional future options without cluttering the apex  
+
+**Cons:**
+- Not as visible in the apex
+- Users require knowledge of dnssecuritytxt and/or the \_security.domain.com subdomain
+
+| Description | Domain | Type | Content |
+|---|---|---|---|
+| Direct email reporting contact | \_security.domain.com | TXT | "security_contact=mailto:security@domain.com" |
+| Direct web form reporting contact | \_security.domain.com | TXT | "security_contact=https://domain.com/report-security-issue" |
+| 3rd party web form reporting contact | \_security.domain.com | TXT | "security_contact=https://bugcrowd.com/domain/report" |
+| Direct policy URL | \_security.domain.com | TXT | "security_policy=https://domain.com/security-policy" |
+| 3rd party web form reporting URL | \_security.domain.com | TXT | "security_policy=https://bugcrowd.com/domain" |
+
+## Frequently Asked Questions**
+Is this a replacement for [security.txt](https://securitytxt.org)?  
 - It can be, but it doesn't need to be - security.txt can work well for individual hosts or hosts which are only addressable via an IP address, with DNS Security TXT providing directions from the parent domain.
 - If there is a discrepancy between a parent DNS Security TXT records and a security.txt file, and DNS Security TXT record should prevail.
 Since DNS is typically more permanent than individual web hosts and the text files they hold, a DNS Security TXT record is more authoritative.
@@ -62,7 +105,7 @@ Since DNS is typically more permanent than individual web hosts and the text fil
 
 **Can I deploy this on a subdomain?**  
 - Yes! While we strongly recommend assigning the TXT record to the root domain of an organization, we've created the standard in a way that supports subdomains and even hosts if required. 
-- This is useful if contact or policy details are different across different departments, or if a specific department has a vulnearbility disclosure policy but the parent organization does not.  
+- This is useful if contact or policy details are different across different departments, or if a specific department has a vulnerability disclosure policy but the parent organization does not.  
 
 **Who in my organization do I need to engage with to get these records in place?**
 - This will depend on the size of your organization and who is responsible for maintaining DNS. 
@@ -72,8 +115,7 @@ Since DNS is typically more permanent than individual web hosts and the text fil
 - Email is optional as a field. 
 - If you are worried about unsolicited email, set a URI as the value and link to your security policy and web form for issue reporting.
 
-**Where do I put these entries?**  
-- In your DNS… :) 
+**How do I put these entries into my DNS?**  
 - Searching "how to add TXT records to DNS" in combination with your DNS provider or system will help you.
 
 ---
