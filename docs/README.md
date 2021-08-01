@@ -68,11 +68,11 @@ Just as security.txt can be deployed into either the root or the .well-known dir
 
 | Description | Domain | Type | Content |
 |---|---|---|---|
-| Direct email reporting contact | \_security.domain.com | TXT | "security_contact=mailto:security@domain.com" |
-| Direct web form reporting contact | \_security.domain.com | TXT | "security_contact=https://domain.com/report-security-issue" |
-| 3rd party web form reporting contact | \_security.domain.com | TXT | "security_contact=https://bugcrowd.com/domain/report" | 
-| Direct policy URL | \_security.domain.com | TXT | "security_policy=https://domain.com/security-policy" | 
-| 3rd party web form reporting URL | \_security.domain.com | TXT | "security_policy=https://bugcrowd.com/domain" |
+| Direct email reporting contact | domain.com | TXT | "security_contact=mailto:security@domain.com" |
+| Direct web form reporting contact | domain.com | TXT | "security_contact=https://domain.com/report-security-issue" |
+| 3rd party web form reporting contact | domain.com | TXT | "security_contact=https://bugcrowd.com/domain/report" | 
+| Direct policy URL | .domain.com | TXT | "security_policy=https://domain.com/security-policy" | 
+| 3rd party web form reporting URL | domain.com | TXT | "security_policy=https://bugcrowd.com/domain" |
 
 ### \_security.domain.com approach
 
