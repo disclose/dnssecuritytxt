@@ -1,9 +1,7 @@
-# dnssecuritytxt 
-A standard allowing organizations to nominate security contact points and policies via DNS TXT records.  
+# activitypubsecuritytxt
+A standard allowing organizations to nominate security contact points and policies via ActivityPub Actors.  
 
-> This proposal was first made public on March 25, 2021 and is is currently a draft. We welcome comments and feedback! To make suggestions please submit a PR via Github or [submit a ticket](https://github.com/disclose/dnssecuritytxt/issues). Thanks for your interest!  
-
-Find us on Twitter: [https://twitter.com/dnssecuritytxt](https://twitter.com/dnssecuritytxt).  
+> This proposal was first made public on January 30, 2023 and is is currently a draft. We welcome comments and feedback! To make suggestions please submit a PR via Github or [submit a ticket](https://github.com/pdxjohnny/activitypubsecuritytxt/issues). Thanks for your interest!  
 
 ## Summary  
 
@@ -11,7 +9,9 @@ When people find security issues in Internet-facing systems, the correct channel
 
 When deployed, it provides security researchers, Internauts, and concerned Internet citizens with clear and authoritative direction towards the correct channels for reporting security issues and the governing policies set out by an organization for all systems under a domain.  
 
-![DNS Text Screencap for disclose.io](https://github.com/disclose/dnssecuritytxt/raw/main/docs/dnssecuritytxt.png)
+```json
+
+```
 
 ## Why?  
 
