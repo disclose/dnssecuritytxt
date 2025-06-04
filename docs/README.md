@@ -42,6 +42,13 @@ DNS is core to the Internet's operation, and interrogating DNS is a fundamental 
     - https://domain.com/report-security-issue
     - https://bugcrowd.com/domain/report
     - mailto:security@domain.com
+- **expiration (Required)**
+  - The date and time when this record should be considered expired.
+  - Must be formatted according to ISO 8601/RFC 3339 (e.g., 2024-12-31T23:59:59Z).
+  - Should be set to less than one year in the future to avoid staleness.
+  - Must appear exactly once.
+  - Example:
+    - 2024-12-31T23:59:59Z
 - **security_policy (Optional)**
   - A link to a policy detailing what finders should expect when reporting via the contact channels, and what security researchers should do when searching for security issues. 
   - Please include ''https://''. 
@@ -69,6 +76,7 @@ Just as security.txt can be deployed into either the root or the .well-known dir
 | Description | Domain | Type | Content |
 |---|---|---|---|
 | Direct email reporting contact | domain.com | TXT | "security_contact=mailto:security@domain.com" |
+| Expiration date | domain.com | TXT | "expiration=2024-12-31T23:59:59Z" |
 | Direct web form reporting contact | domain.com | TXT | "security_contact=https://domain.com/report-security-issue" |
 | 3rd party web form reporting contact | domain.com | TXT | "security_contact=https://bugcrowd.com/domain/report" | 
 | Direct policy URL | .domain.com | TXT | "security_policy=https://domain.com/security-policy" | 
@@ -87,6 +95,7 @@ Just as security.txt can be deployed into either the root or the .well-known dir
 | Description | Domain | Type | Content |
 |---|---|---|---|
 | Direct email reporting contact | \_security.domain.com | TXT | "security_contact=mailto:security@domain.com" |
+| Expiration date | \_security.domain.com | TXT | "expiration=2024-12-31T23:59:59Z" |
 | Direct web form reporting contact | \_security.domain.com | TXT | "security_contact=https://domain.com/report-security-issue" |
 | 3rd party web form reporting contact | \_security.domain.com | TXT | "security_contact=https://bugcrowd.com/domain/report" |
 | Direct policy URL | \_security.domain.com | TXT | "security_policy=https://domain.com/security-policy" |
