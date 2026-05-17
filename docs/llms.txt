@@ -1,0 +1,26 @@
+# dnssecuritytxt.org
+
+> Proposed DNS-based standard for nominating security contact points and policies via TXT records.
+
+A draft standardization effort under the disclose.io project, currently being prepared for IETF submission. The proposal extends the principles behind security.txt (RFC 9116) to the DNS layer, so organizations can publish security contacts and policies without requiring an HTTP server on the asset being queried.
+
+## Status
+
+- **Proposal first published:** March 25, 2021
+- **Current state:** IETF draft preparation (`draft-ellis-dns-security-txt-00`)
+- **Authors:** John Carroll, Casey Ellis
+- **Sponsor:** The disclose.io Project
+
+## Reference
+
+- **Site:** https://dnssecuritytxt.org
+- **Repository:** https://github.com/disclose/dnssecuritytxt
+- **Issues / feedback:** https://github.com/disclose/dnssecuritytxt/issues
+- **Twitter:** https://twitter.com/dnssecuritytxt
+- **Parent project:** https://disclose.io
+
+## Related standards
+
+- [RFC 9116 — `security.txt`](https://datatracker.ietf.org/doc/rfc9116/) — the HTTP-served original this proposal extends to DNS.
+- [disclose.io Framework](https://disclose.io/framework/) — canonical vulnerability disclosure policy terms.
+- [lookup.disclose.io](https://lookup.disclose.io) — the attribution tool that would consume DNS-published security contacts at runtime.
