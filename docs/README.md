@@ -39,20 +39,20 @@ DNS is core to the Internet's operation, and interrogating DNS is a fundamental 
   - Please include ''https://'' for URLs and ''mailto:'' for e-mails.
   - If both a web form and an e-mail are required, you can create two separate records.
   - Examples:
-    - https://domain.com/report-security-issue
+    - https://example.com/report-security-issue
     - https://bugcrowd.com/domain/report
-    - mailto:security@domain.com
+    - mailto:security@example.com
 - **security_policy (Optional)**
   - A link to a policy detailing what finders should expect when reporting via the contact channels, and what security researchers should do when searching for security issues. 
   - Please include ''https://''. 
   - Examples:
-    - https://domain.com/security
+    - https://example.com/security
     - https://bugcrowd.com/domain
 - _Note: The maximum number of characters in a TXT record is 255 characters per https://www.freesoft.org/CIE/RFC/1035/9.htm._
 
 ## Deployment Options
 
-Just as security.txt can be deployed into either the .well-known directory of a webserver or, for legacy compatibility, the webserver root (RFC 9116 defines /.well-known/security.txt as the normative location), DNS Security TXT can be deployed to either the apex of a domain, or under a specially created \_security.domain.com subdomain. This approach allows organizations to decide the approach that suits them best.
+Just as security.txt can be deployed into either the .well-known directory of a webserver or, for legacy compatibility, the webserver root (RFC 9116 defines /.well-known/security.txt as the normative location), DNS Security TXT can be deployed to either the apex of a domain, or under a specially created \_security.example.com subdomain. This approach allows organizations to decide the approach that suits them best.
 
 ### Apex approach
 
@@ -68,13 +68,13 @@ Just as security.txt can be deployed into either the .well-known directory of a 
 
 | Description | Domain | Type | Content |
 |---|---|---|---|
-| Direct email reporting contact | domain.com | TXT | "security_contact=mailto:security@domain.com" |
-| Direct web form reporting contact | domain.com | TXT | "security_contact=https://domain.com/report-security-issue" |
-| 3rd party web form reporting contact | domain.com | TXT | "security_contact=https://bugcrowd.com/domain/report" | 
-| Direct policy URL | .domain.com | TXT | "security_policy=https://domain.com/security-policy" | 
-| 3rd party web form reporting URL | domain.com | TXT | "security_policy=https://bugcrowd.com/domain" |
+| Direct email reporting contact | example.com | TXT | "security_contact=mailto:security@example.com" |
+| Direct web form reporting contact | example.com | TXT | "security_contact=https://example.com/report-security-issue" |
+| 3rd party web form reporting contact | example.com | TXT | "security_contact=https://bugcrowd.com/domain/report" | 
+| Direct policy URL | .example.com | TXT | "security_policy=https://example.com/security-policy" | 
+| 3rd party web form reporting URL | example.com | TXT | "security_policy=https://bugcrowd.com/domain" |
 
-### \_security.domain.com approach
+### \_security.example.com approach
 
 **Pros:**
 - Maintains apex zone hygiene
@@ -82,15 +82,15 @@ Just as security.txt can be deployed into either the .well-known directory of a 
 
 **Cons:**
 - Not as visible in the apex
-- Users require knowledge of dnssecuritytxt and/or the \_security.domain.com subdomain
+- Users require knowledge of dnssecuritytxt and/or the \_security.example.com subdomain
 
 | Description | Domain | Type | Content |
 |---|---|---|---|
-| Direct email reporting contact | \_security.domain.com | TXT | "security_contact=mailto:security@domain.com" |
-| Direct web form reporting contact | \_security.domain.com | TXT | "security_contact=https://domain.com/report-security-issue" |
-| 3rd party web form reporting contact | \_security.domain.com | TXT | "security_contact=https://bugcrowd.com/domain/report" |
-| Direct policy URL | \_security.domain.com | TXT | "security_policy=https://domain.com/security-policy" |
-| 3rd party web form reporting URL | \_security.domain.com | TXT | "security_policy=https://bugcrowd.com/domain" |
+| Direct email reporting contact | \_security.example.com | TXT | "security_contact=mailto:security@example.com" |
+| Direct web form reporting contact | \_security.example.com | TXT | "security_contact=https://example.com/report-security-issue" |
+| 3rd party web form reporting contact | \_security.example.com | TXT | "security_contact=https://bugcrowd.com/domain/report" |
+| Direct policy URL | \_security.example.com | TXT | "security_policy=https://example.com/security-policy" |
+| 3rd party web form reporting URL | \_security.example.com | TXT | "security_policy=https://bugcrowd.com/domain" |
 
 ## Frequently Asked Questions**
 Is this a replacement for [security.txt](https://securitytxt.org)?  
