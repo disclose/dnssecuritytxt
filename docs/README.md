@@ -52,7 +52,7 @@ DNS is core to the Internet's operation, and interrogating DNS is a fundamental 
 
 ## Deployment Options
 
-Just as security.txt can be deployed into either the root or the .well-known directory of a webserver, DNS Security TXT can be deployed to either the apex of a domain, or under a specially created \_security.domain.com subdomain. This approach allows organizations to decide the approach that suits them best.
+Just as security.txt can be deployed into either the .well-known directory of a webserver or, for legacy compatibility, the webserver root (RFC 9116 defines /.well-known/security.txt as the normative location), DNS Security TXT can be deployed to either the apex of a domain, or under a specially created \_security.domain.com subdomain. This approach allows organizations to decide the approach that suits them best.
 
 ### Apex approach
 
