@@ -13,7 +13,7 @@
 <a href="https://github.com/disclose/dnssecuritytxt/issues"><img src="https://img.shields.io/badge/feedback-welcome-5B3AB6" alt="Feedback welcome"></a>
 </p>
 
-*Part of [the disclose.io Project](https://disclose.io) · a DNS-native companion to [security.txt (RFC 9116)](https://www.rfc-editor.org/rfc/rfc9116)*
+*Part of **[the disclose.io Project](https://disclose.io)** — the open, vendor-neutral infrastructure for vulnerability disclosure. [Browse the ecosystem →](https://github.com/disclose)*
 
 </div>
 
