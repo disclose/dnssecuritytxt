@@ -18,8 +18,10 @@ footer:
 disqus:
     shortname:      disclose_io
 
-# Google Analytics 4 measurement ID (UA-143424917-10 was Universal Analytics, dead since 2023-07)
-google_analytics:   G-GLJF09Y0DB
+# Google Analytics: intentionally UNSET. The theme's built-in analytics uses legacy
+# analytics.js (ga.js), which does NOT work with GA4 IDs. GA4 (G-GLJF09Y0DB) is injected
+# via _includes/head-custom.html instead. (UA-143424917-10 was Universal Analytics, dead since 2023-07.)
+# google_analytics:
 
 gems:
   - jekyll-feed
