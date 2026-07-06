@@ -1,0 +1,6 @@
+Contact: mailto:security@disclose.io
+Contact: https://disclose.io/security/
+Expires: 2027-06-30T00:00:00.000Z
+Preferred-Languages: en
+Policy: https://disclose.io/security/
+Canonical: https://dnssecuritytxt.org/.well-known/security.txt

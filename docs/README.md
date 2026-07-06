@@ -52,9 +52,28 @@ DNS is core to the Internet's operation, and interrogating DNS is a fundamental 
 
 ## Deployment Options
 
-Just as security.txt can be deployed into either the .well-known directory of a webserver or, for legacy compatibility, the webserver root (RFC 9116 defines /.well-known/security.txt as the normative location), DNS Security TXT can be deployed to either the apex of a domain, or under a specially created \_security.domain.com subdomain. This approach allows organizations to decide the approach that suits them best.
+Just as security.txt can be deployed into either the .well-known directory of a webserver or, for legacy compatibility, the webserver root (RFC 9116 defines /.well-known/security.txt as the normative location), DNS Security TXT can be deployed under a specially created \_security.domain.com subdomain (recommended), or at the apex of a domain as a discovery fallback. Clients and researchers should check \_security.domain.com first, then fall back to the domain apex; per-host details live in that host's /.well-known/security.txt.
 
-### Apex approach
+### \_security.domain.com approach (recommended)
+
+**Pros:**
+- Maintains apex zone hygiene
+- Better support for additional future options without cluttering the apex  
+- Follows the established underscored-name convention (\_dmarc, \_mta-sts, \_bimi) per RFC 8552
+
+**Cons:**
+- Not as visible in the apex
+- Users require knowledge of dnssecuritytxt and/or the \_security.domain.com subdomain
+
+| Description | Domain | Type | Content |
+|---|---|---|---|
+| Direct email reporting contact | \_security.domain.com | TXT | "security_contact=mailto:security@domain.com" |
+| Direct web form reporting contact | \_security.domain.com | TXT | "security_contact=https://domain.com/report-security-issue" |
+| 3rd party web form reporting contact | \_security.domain.com | TXT | "security_contact=https://bugcrowd.com/domain/report" |
+| Direct policy URL | \_security.domain.com | TXT | "security_policy=https://domain.com/security-policy" |
+| 3rd party web form reporting URL | \_security.domain.com | TXT | "security_policy=https://bugcrowd.com/domain" |
+
+### Apex approach (discovery fallback)
 
 **Pros:**
 - Obvious and familiar to users 
@@ -71,32 +90,16 @@ Just as security.txt can be deployed into either the .well-known directory of a 
 | Direct email reporting contact | domain.com | TXT | "security_contact=mailto:security@domain.com" |
 | Direct web form reporting contact | domain.com | TXT | "security_contact=https://domain.com/report-security-issue" |
 | 3rd party web form reporting contact | domain.com | TXT | "security_contact=https://bugcrowd.com/domain/report" | 
-| Direct policy URL | .domain.com | TXT | "security_policy=https://domain.com/security-policy" | 
+| Direct policy URL | domain.com | TXT | "security_policy=https://domain.com/security-policy" | 
 | 3rd party web form reporting URL | domain.com | TXT | "security_policy=https://bugcrowd.com/domain" |
 
-### \_security.domain.com approach
+## Frequently Asked Questions
 
-**Pros:**
-- Maintains apex zone hygiene
-- Better support for additional future options without cluttering the apex  
-
-**Cons:**
-- Not as visible in the apex
-- Users require knowledge of dnssecuritytxt and/or the \_security.domain.com subdomain
-
-| Description | Domain | Type | Content |
-|---|---|---|---|
-| Direct email reporting contact | \_security.domain.com | TXT | "security_contact=mailto:security@domain.com" |
-| Direct web form reporting contact | \_security.domain.com | TXT | "security_contact=https://domain.com/report-security-issue" |
-| 3rd party web form reporting contact | \_security.domain.com | TXT | "security_contact=https://bugcrowd.com/domain/report" |
-| Direct policy URL | \_security.domain.com | TXT | "security_policy=https://domain.com/security-policy" |
-| 3rd party web form reporting URL | \_security.domain.com | TXT | "security_policy=https://bugcrowd.com/domain" |
-
-## Frequently Asked Questions**
-Is this a replacement for [security.txt](https://securitytxt.org)?  
+**Is this a replacement for [security.txt](https://securitytxt.org)?**  
 - It can be, but it doesn't need to be - security.txt can work well for individual hosts or hosts which are only addressable via an IP address, with DNS Security TXT providing directions from the parent domain.
-- If there is a discrepancy between a parent DNS Security TXT records and a security.txt file, and DNS Security TXT record should prevail.
-Since DNS is typically more permanent than individual web hosts and the text files they hold, a DNS Security TXT record is more authoritative.
+- If a DNS Security TXT record and a security.txt file disagree, the source with the stronger authentication should be treated as more authoritative: a compliant security.txt is served over HTTPS and authenticated by the web server's TLS certificate (RFC 9116), while a DNS TXT record is cryptographically authenticated only when the zone is signed with DNSSEC.
+- Where both sources are equally authenticated, the host-level security.txt is the more specific source for that host, and the DNS record speaks for the domain as a whole. In every case, a discrepancy between the two is itself worth reporting - publishers should keep them consistent.
+- A DNS Security TXT record in an unsigned zone remains a useful discovery signal - it simply shouldn't override an authenticated security.txt when the two conflict.
 
 **Is this giving anyone permission to hack my organization?**  
 - No, this provides a place for people to send security reports if they find something. 
