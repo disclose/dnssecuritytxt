@@ -18,8 +18,8 @@ footer:
 disqus:
     shortname:      disclose_io
 
-# Google analytics code, get your code here https://www.google.com/analytics/
-google_analytics:   UA-143424917-10
+# Google Analytics 4 measurement ID (UA-143424917-10 was Universal Analytics, dead since 2023-07)
+google_analytics:   G-GLJF09Y0DB
 
 gems:
   - jekyll-feed

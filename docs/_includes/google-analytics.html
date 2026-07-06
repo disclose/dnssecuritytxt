@@ -1,0 +1,8 @@
+<!-- GA4 (gtag.js) — overrides the theme's legacy analytics.js include, which only supports Universal Analytics (dead since 2023-07). Uses site.google_analytics (G-GLJF09Y0DB). -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics }}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '{{ site.google_analytics }}');
+</script>
