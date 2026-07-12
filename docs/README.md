@@ -21,7 +21,7 @@ It is common practice to use DNS TXT to establish authorization from a domain. A
 
 DNS records speak on behalf of the organization and not just an individual server or application owner. Pairing security reporting and policy information with the authoritative nature of DNS creates confidence in the information provided. 
 
-This attribute of DNS TXT records makes them a suitable place to confirm, on behalf of the organization, good-faith towards security reports or authorization for testing (this permission to authorize is a core enabler for safe harbor for security researchers), and clear instructions about where security issues should be sent.
+This attribute of DNS TXT records makes them a suitable place to publish clear instructions about where security issues should be sent and where the organization's security policy can be found. A DNS Security TXT record does not itself authorize testing; authorization or safe-harbor terms must be stated explicitly in the linked policy.
 
 ### Centralized  
 
@@ -29,7 +29,7 @@ Management of DNS records is centralized, making these records simple to deploy,
 
 ### Visible  
 
-DNS is core to the Internet's operation, and interrogating DNS is a fundamental footprinting activity in penetration tests, automated scans, and fee-form security research, meaning the correct contact details and policy information are less likely to be missed 
+DNS is core to the Internet's operation, and interrogating DNS is a fundamental footprinting activity in penetration tests, automated scans, and free-form security research, meaning the correct contact details and policy information are less likely to be missed.
 
 
 ## Fields  
@@ -48,13 +48,18 @@ DNS is core to the Internet's operation, and interrogating DNS is a fundamental 
   - Examples:
     - https://example.com/security
     - https://bugcrowd.com/domain
-- _Note: The maximum number of characters in a TXT record is 255 characters per https://www.freesoft.org/CIE/RFC/1035/9.htm._
+- **security_expires (Required, exactly once)**
+  - An RFC 3339 timestamp indicating when all contact and policy information in the RRset becomes stale and must no longer be used.
+  - The timestamp must be in Coordinated Universal Time using the `Z` suffix and must be in the future when published.
+  - Publishers should choose a timestamp less than one year in the future, consistent with RFC 9116.
+  - Example: `2027-01-01T00:00:00Z`
+- _Note: each character-string in TXT RDATA is limited to 255 octets by RFC 1035. A TXT resource record can contain multiple character-strings, which clients concatenate without adding whitespace. Publishers should keep each logical DNS Security TXT record within one 255-octet character-string where practical._
 
 ## Deployment Options
 
-Just as security.txt can be deployed into either the .well-known directory of a webserver or, for legacy compatibility, the webserver root (RFC 9116 defines /.well-known/security.txt as the normative location), DNS Security TXT can be deployed under a specially created \_security.example.com subdomain (recommended), or at the apex of a domain as a discovery fallback. Clients and researchers should check \_security.example.com first, then fall back to the domain apex; per-host details live in that host's /.well-known/security.txt.
+The proposed IETF specification defines `_security.example.com` as the sole normative owner name. This follows the underscored-name convention in RFC 8552, avoids collisions with unrelated apex TXT records, and permits an explicit IANA registration. Clients query `_security.example.com`; they do not automatically fall back to the apex or walk toward the DNS root. Per-host HTTP details can continue to live in that host's `/.well-known/security.txt` file under RFC 9116.
 
-### \_security.example.com approach (recommended)
+### \_security.example.com approach (normative)
 
 **Pros:**
 - Maintains apex zone hygiene
@@ -72,34 +77,24 @@ Just as security.txt can be deployed into either the .well-known directory of a 
 | 3rd party web form reporting contact | \_security.example.com | TXT | "security_contact=https://bugcrowd.com/domain/report" |
 | Direct policy URL | \_security.example.com | TXT | "security_policy=https://example.com/security-policy" |
 | 3rd party web form reporting URL | \_security.example.com | TXT | "security_policy=https://bugcrowd.com/domain" |
+| Expiration timestamp | \_security.example.com | TXT | "security_expires=2027-01-01T00:00:00Z" |
 
-### Apex approach (discovery fallback)
+### Legacy apex deployments
 
-**Pros:**
-- Obvious and familiar to users 
-- Easy to find
-- Resilient 
-- Greater authority on behalf of the domain and it's owner  
-
-**Cons:**
-- Additional TXT records in domain apex 
-- Not conducive to additional options
-
-| Description | Domain | Type | Content |
-|---|---|---|---|
-| Direct email reporting contact | example.com | TXT | "security_contact=mailto:security@example.com" |
-| Direct web form reporting contact | example.com | TXT | "security_contact=https://example.com/report-security-issue" |
-| 3rd party web form reporting contact | example.com | TXT | "security_contact=https://bugcrowd.com/domain/report" | 
-| Direct policy URL | example.com | TXT | "security_policy=https://example.com/security-policy" | 
-| 3rd party web form reporting URL | example.com | TXT | "security_policy=https://bugcrowd.com/domain" |
+The 2021 proposal allowed apex records as a discovery fallback. The proposed IETF specification removes that behavior because apex TXT RRsets commonly contain unrelated protocols and do not provide explicit scoping. Existing operators should add `security_expires`, copy all DNS Security TXT records to `_security`, and remove the apex copies after an appropriate transition period. Clients may offer an explicitly labeled legacy mode, but it should not be enabled by default.
 
 ## Frequently Asked Questions
 
 **Is this a replacement for [security.txt](https://securitytxt.org)?**  
 - It can be, but it doesn't need to be - security.txt can work well for individual hosts or hosts which are only addressable via an IP address, with DNS Security TXT providing directions from the parent domain.
-- If a DNS Security TXT record and a security.txt file disagree, the source with the stronger authentication should be treated as more authoritative: a compliant security.txt is served over HTTPS and authenticated by the web server's TLS certificate (RFC 9116), while a DNS TXT record is cryptographically authenticated only when the zone is signed with DNSSEC.
-- Where both sources are equally authenticated, the host-level security.txt is the more specific source for that host, and the DNS record speaks for the domain as a whole. In every case, a discrepancy between the two is itself worth reporting - publishers should keep them consistent.
-- A DNS Security TXT record in an unsigned zone remains a useful discovery signal - it simply shouldn't override an authenticated security.txt when the two conflict.
+- The mechanisms have different scopes and authentication properties: security.txt can describe a specific HTTP service, while DNS Security TXT provides information for a selected reference domain.
+- If valid results disagree, clients should present all applicable contact information and highlight the inconsistency rather than applying a universal precedence rule. Publishers should keep both mechanisms consistent.
+- A DNS Security TXT record in an unsigned zone remains useful for discovery, but it is not cryptographically authenticated. A DNSSEC result of Bogus must not be used.
+
+**Why is `security_expires` required?**
+- Stale contact information can misdirect sensitive vulnerability reports or cause them to be lost entirely.
+- The field follows the freshness model of RFC 9116: it appears exactly once, uses an RFC 3339 timestamp, and marks the point after which the entire RRset must not be used.
+- Clients check the timestamp whenever they use cached information. A longer DNS TTL cannot extend the stated expiration time.
 
 **Is this giving anyone permission to hack my organization?**  
 - No, this provides a place for people to send security reports if they find something. 
