@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DNS Security TXT — publish security contacts in DNS</title>
+  <meta name="description" content="Publish vulnerability reporting contacts, policy links, and an expiration time at _security.your-domain using DNS TXT records.">
+  <meta name="theme-color" content="#171126">
+  <meta property="og:title" content="DNS Security TXT">
+  <meta property="og:description" content="Make the right security contact discoverable before anyone connects to a service.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://dnssecuritytxt.org/">
+  <link rel="canonical" href="https://dnssecuritytxt.org/">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GLJF09Y0DB"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GLJF09Y0DB');
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="shell nav-wrap">
+      <a class="brand" href="/" aria-label="DNS Security TXT home">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span>dnssecuritytxt</span>
+      </a>
+      <nav class="primary-nav" aria-label="Primary navigation">
+        <a href="#publish">Publish</a>
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
+        <a href="/draft-ellis-dns-security-contact-00.html">Internet-Draft</a>
+      </nav>
+      <a class="nav-ecosystem" href="https://disclose.io/">A disclose.io project <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="shell hero-layout">
+        <div class="hero-copy">
+          <p class="eyebrow"><span></span> Proposed standard · Internet-Draft in preparation</p>
+          <h1>Make the right security contact <em>easy to find.</em></h1>
+          <p class="lede">Publish vulnerability reporting contacts and policy links in DNS—before a researcher connects to a service.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#publish">Publish your records</a>
+            <a class="button button-secondary" href="/draft-ellis-dns-security-contact-00.html">Read the draft <span aria-hidden="true">↗</span></a>
+          </div>
+          <p class="hero-note">Domain-scoped. Transport-independent. Freshness built in.</p>
+        </div>
+
+        <div class="terminal-card" aria-label="DNS Security TXT example">
+          <div class="terminal-top">
+            <div class="terminal-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+            <span>_security.example.com</span>
+            <button class="copy-mini" type="button" data-copy-target="hero-records">Copy</button>
+          </div>
+          <pre id="hero-records"><code><span class="code-name">_security.example.com.</span> 3600 IN TXT
+  <span class="code-value">"security_contact=mailto:security@example.com"</span>
+<span class="code-name">_security.example.com.</span> 3600 IN TXT
+  <span class="code-value">"security_policy=https://example.com/security"</span>
+<span class="code-name">_security.example.com.</span> 3600 IN TXT
+  <span class="code-value">"security_expires=2027-01-01T00:00:00Z"</span></code></pre>
+          <div class="terminal-foot">
+            <span><i class="status-dot"></i> one DNS query</span>
+            <span>TXT · RFC 3339</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="reference-strip" aria-labelledby="reference-heading">
+      <div class="shell reference-layout">
+        <div>
+          <p class="section-kicker">Reference programs</p>
+          <h2 id="reference-heading">Disclosure at Internet scale</h2>
+          <p>Five significant programs from the disclose.io directory. Reference examples—not claims of DNS Security TXT deployment.</p>
+        </div>
+        <div class="org-list" aria-label="Reference disclosure programs">
+          <a href="https://directory.disclose.io/o/vrp-9c4f21">Google <span>VRP</span></a>
+          <a href="https://directory.disclose.io/o/microsoft-4129cc">Microsoft <span>MSRC</span></a>
+          <a href="https://directory.disclose.io/o/apple-6130ab">Apple <span>Security Bounty</span></a>
+          <a href="https://directory.disclose.io/o/cloudflare-ba9135">Cloudflare <span>Disclosure</span></a>
+          <a href="https://directory.disclose.io/o/bounty-github-269077">GitHub <span>Bug Bounty</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section publish-section" id="publish">
+      <div class="shell">
+        <div class="section-heading centered">
+          <p class="section-kicker">Publish</p>
+          <h2>Three records. One clear route.</h2>
+          <p>Set a contact, optionally link a policy, and state when the information expires.</p>
+        </div>
+
+        <div class="builder">
+          <form class="builder-form" id="record-form">
+            <div class="field">
+              <label for="domain">Domain</label>
+              <input id="domain" name="domain" type="text" inputmode="url" value="example.com" autocomplete="off" required>
+              <span>The reference domain, without <code>_security</code>.</span>
+            </div>
+            <div class="field">
+              <label for="contact">Security contact</label>
+              <input id="contact" name="contact" type="text" value="mailto:security@example.com" autocomplete="off" required>
+              <span>An absolute <code>mailto:</code> or <code>https://</code> URI.</span>
+            </div>
+            <div class="field">
+              <label for="policy">Security policy <small>Optional</small></label>
+              <input id="policy" name="policy" type="url" value="https://example.com/security" autocomplete="off">
+              <span>An HTTPS vulnerability disclosure policy.</span>
+            </div>
+            <div class="field">
+              <label for="expires">Expires</label>
+              <input id="expires" name="expires" type="text" autocomplete="off" required>
+              <span>RFC 3339 UTC. Keep it less than one year ahead.</span>
+            </div>
+          </form>
+
+          <div class="builder-output">
+            <div class="output-top">
+              <div>
+                <span class="output-label">Zone-file output</span>
+                <strong>Ready to publish</strong>
+              </div>
+              <button class="button button-small" type="button" data-copy-target="generated-records">Copy records</button>
+            </div>
+            <pre id="generated-records" tabindex="0"></pre>
+            <p id="builder-message" class="builder-message" role="status" aria-live="polite">Values update as you type.</p>
+          </div>
+        </div>
+
+        <div class="field-summary" aria-label="Record field requirements">
+          <article>
+            <span class="field-number">01</span>
+            <div><h3>security_contact</h3><p>Required. Publish one or more absolute reporting URIs.</p></div>
+          </article>
+          <article>
+            <span class="field-number">02</span>
+            <div><h3>security_policy</h3><p>Optional. Point to the applicable HTTPS policy.</p></div>
+          </article>
+          <article>
+            <span class="field-number">03</span>
+            <div><h3>security_expires</h3><p>Required exactly once. Expired information is not used.</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section dark-section" id="how">
+      <div class="shell">
+        <div class="section-heading light-heading">
+          <p class="section-kicker">Discovery</p>
+          <h2>A domain-level default, without guesswork.</h2>
+        </div>
+        <ol class="process-list">
+          <li><span>1</span><div><h3>Choose the reference domain</h3><p>The application determines the domain whose security information it needs.</p></div></li>
+          <li><span>2</span><div><h3>Query <code>_security</code></h3><p>Resolve the TXT RRset at <code>_security.&lt;domain&gt;</code>. No automatic apex fallback.</p></div></li>
+          <li><span>3</span><div><h3>Validate before use</h3><p>Parse known fields, check expiration, honor DNSSEC, and surface inconsistencies.</p></div></li>
+        </ol>
+        <div class="scope-note">
+          <div class="scope-icon" aria-hidden="true">↔</div>
+          <div><h3>Works with security.txt</h3><p>DNS Security TXT supplies a domain-scoped default. RFC 9116 remains the host-specific HTTP mechanism. Publishers should keep both consistent.</p></div>
+          <a href="https://securitytxt.org/">About security.txt <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section principles-section">
+      <div class="shell principles-grid">
+        <div class="section-heading">
+          <p class="section-kicker">Why DNS</p>
+          <h2>Findable before the first request.</h2>
+          <p>Security contact discovery should not depend on an application being online, correctly routed, or even HTTP-based.</p>
+        </div>
+        <div class="principle-cards">
+          <article><span>⌁</span><h3>Authoritative location</h3><p>DNS gives the domain operator a clear place to publish reporting information.</p></article>
+          <article><span>◎</span><h3>Central maintenance</h3><p>One RRset can describe the default for services associated with a domain.</p></article>
+          <article><span>◷</span><h3>Explicit freshness</h3><p><code>security_expires</code> prevents stale contacts from living forever.</p></article>
+          <article><span>◇</span><h3>Non-HTTP discovery</h3><p>Clients can find a contact without assuming a working website or web stack.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section ecosystem-section">
+      <div class="shell">
+        <div class="section-heading centered">
+          <p class="section-kicker">disclose.io ecosystem</p>
+          <h2>From discovery to disclosure.</h2>
+          <p>Open, vendor-neutral infrastructure for getting security reports to the right place.</p>
+        </div>
+        <div class="ecosystem-grid">
+          <a class="ecosystem-card featured" href="https://lookup.disclose.io/">
+            <span class="card-label">Lookup</span>
+            <h3>Find who to tell.</h3>
+            <p>Resolve an asset to its owner and best security contact.</p>
+            <strong>Open lookup <span aria-hidden="true">↗</span></strong>
+          </a>
+          <a class="ecosystem-card" href="https://directory.disclose.io/">
+            <span class="card-label">Directory</span>
+            <h3>Browse disclosure programs.</h3>
+            <p>Search 27,000+ vulnerability disclosure and bounty programs.</p>
+            <strong>Open directory <span aria-hidden="true">↗</span></strong>
+          </a>
+          <a class="ecosystem-card" href="https://disclose.io/framework/">
+            <span class="card-label">Framework</span>
+            <h3>Build a safer policy.</h3>
+            <p>Practical language for authorization, safe harbor, and disclosure.</p>
+            <strong>Read framework <span aria-hidden="true">↗</span></strong>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq-section" id="faq">
+      <div class="shell faq-layout">
+        <div class="section-heading">
+          <p class="section-kicker">FAQ</p>
+          <h2>Short answers.</h2>
+          <p>The Internet-Draft is normative. This page stays deliberately practical.</p>
+        </div>
+        <div class="faq-list">
+          <details open><summary>Does this replace security.txt?</summary><p>No. DNS Security TXT provides domain-scoped discovery, including for non-HTTP services. RFC 9116 remains useful for host-specific information.</p></details>
+          <details><summary>Does publishing a record authorize testing?</summary><p>No. A contact record is not permission to test. Any authorization, safe harbor, or rules of engagement must be explicit in the applicable policy.</p></details>
+          <details><summary>Why is expiration required?</summary><p>Stale contacts can lose or misdirect sensitive reports. Exactly one RFC 3339 timestamp states when the entire RRset stops being usable.</p></details>
+          <details><summary>Should records also be published at the apex?</summary><p>No for normative deployments. The proposed standard uses <code>_security.&lt;domain&gt;</code>. Apex records are legacy migration material only.</p></details>
+          <details><summary>Is DNSSEC required?</summary><p>Unsigned records remain useful for discovery, but DNSSEC is recommended. A DNSSEC result of Bogus must not be used.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="draft-cta">
+      <div class="shell draft-cta-inner">
+        <div><p class="section-kicker">Open standard</p><h2>Read it. Test it. Improve it.</h2><p>The proposal is being prepared as an individual IETF Internet-Draft. Technical review and implementation feedback are welcome.</p></div>
+        <div class="draft-actions"><a class="button button-light" href="/draft-ellis-dns-security-contact-00.html">Read Internet-Draft</a><a class="button button-outline-light" href="https://github.com/disclose/dnssecuritytxt">Contribute on GitHub <span aria-hidden="true">↗</span></a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-grid">
+      <div class="footer-brand"><a class="brand brand-light" href="/"><span class="brand-mark" aria-hidden="true"><span></span></span><span>dnssecuritytxt</span></a><p>A disclose.io project for making vulnerability reporting contacts easier to find.</p></div>
+      <div><h2>Standard</h2><a href="#publish">Publish</a><a href="#how">How it works</a><a href="#faq">FAQ</a><a href="/draft-ellis-dns-security-contact-00.html">Internet-Draft</a></div>
+      <div><h2>Ecosystem</h2><a href="https://disclose.io/">disclose.io</a><a href="https://lookup.disclose.io/">Lookup</a><a href="https://directory.disclose.io/">Directory</a><a href="https://community.disclose.io/">Community</a></div>
+      <div><h2>Project</h2><a href="https://github.com/disclose/dnssecuritytxt">GitHub</a><a href="https://github.com/disclose/dnssecuritytxt/issues">Feedback</a><a href="https://disclose.io/contact/">Contact</a></div>
+    </div>
+    <div class="shell footer-base"><span>Created by John Carroll and Casey Ellis for The disclose.io Project.</span><span>Open source · Vendor neutral</span></div>
+  </footer>
+
+  <script src="/assets/site.js" defer></script>
+</body>
+</html>
