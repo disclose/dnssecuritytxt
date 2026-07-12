@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude"
+     category="std"
+     consensus="true"
+     docName="draft-ellis-dns-security-contact-00"
+     ipr="trust200902"
+     submissionType="IETF"
+     version="3">
+  <front>
+    <title abbrev="DNS Security Contact Discovery">Discovering Security Contact and Policy Information Using the Domain Name System (DNS)</title>
+    <seriesInfo name="Internet-Draft" value="draft-ellis-dns-security-contact-00"/>
+    <author fullname="Casey Ellis" initials="C." surname="Ellis">
+      <organization>The disclose.io Project</organization>
+      <address>
+        <uri>https://disclose.io/</uri>
+      </address>
+    </author>
+    <author fullname="John Carroll" initials="J." surname="Carroll">
+      <organization>The disclose.io Project</organization>
+      <address>
+        <uri>https://disclose.io/</uri>
+      </address>
+    </author>
+    <date day="12" month="July" year="2026"/>
+    <area>Internet</area>
+    <workgroup>Domain Name System Operations</workgroup>
+    <keyword>vulnerability disclosure</keyword>
+    <keyword>security contact</keyword>
+    <keyword>DNS</keyword>
+    <keyword>TXT</keyword>
+    <abstract>
+      <t>Organizations need a simple way to publish contact points for reports about security vulnerabilities and links to the policies that govern those reports.  This document defines a DNS-based discovery mechanism that uses TXT records at the underscored owner name <tt>_security</tt>.  Records include an expiration timestamp so that stale contact information is not used indefinitely.  The mechanism provides a domain-scoped complement to the host-specific <tt>security.txt</tt> mechanism defined by RFC 9116.</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section numbered="true" toc="include" anchor="introduction">
+      <name>Introduction</name>
+      <t>People who discover security vulnerabilities often have difficulty identifying the correct reporting channel and the policy that applies to a system.  <xref target="RFC9116"/> addresses this problem for HTTP services by defining a file at a well-known URI.  A DNS-based mechanism is useful when a domain operator wants to publish an organization-wide default, when the affected service is not an HTTP service, or when discovery is performed before connecting to a service.</t>
+      <t>This document defines three TXT record forms for publishing security contact URIs, security policy URIs, and the time after which the information is stale.  It does not define a vulnerability reporting protocol, authorize security testing, or replace service-specific contact information.</t>
+    </section>
+
+    <section numbered="true" toc="include" anchor="conventions">
+      <name>Conventions and Definitions</name>
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 <xref target="RFC2119"/> <xref target="RFC8174"/> when, and only when, they appear in all capitals, as shown here.</t>
+      <dl>
+        <dt>Reference Domain:</dt>
+        <dd>The domain name for which an application is attempting to discover security information.  Selection of the Reference Domain is application-specific and is outside the scope of this document.</dd>
+        <dt>Security TXT RRset:</dt>
+        <dd>The IN-class TXT RRset whose owner name is formed by prepending the label <tt>_security</tt> to the Reference Domain.</dd>
+        <dt>Logical TXT Record:</dt>
+        <dd>The octet sequence obtained by concatenating, in order and without added whitespace, all character-strings in the RDATA of one TXT resource record.</dd>
+      </dl>
+    </section>
+
+    <section numbered="true" toc="include" anchor="publication">
+      <name>Publication</name>
+      <section numbered="true" toc="include" anchor="owner-name">
+        <name>Owner Name</name>
+        <t>For a Reference Domain of <tt>example.com</tt>, records conforming to this specification MUST be published in an IN TXT RRset at:</t>
+        <artwork name="owner-name-example" type="dns">_security.example.com.</artwork>
+        <t>The <tt>_security</tt> label scopes the TXT RRset according to <xref target="RFC8552"/>.  Publishing the records at the zone apex is not part of this specification; migration from early, pre-standard deployments is discussed in <xref target="legacy"/>.</t>
+      </section>
+
+      <section numbered="true" toc="include" anchor="record-format">
+        <name>Record Format</name>
+        <t>Each Logical TXT Record defined by this specification contains one field name, an equals sign ("="), and one field value.  Field names are case-insensitive.  No whitespace is permitted before or after the equals sign.  The following ABNF <xref target="RFC5234"/> defines the record forms:</t>
+        <sourcecode name="record-abnf" type="abnf"><![CDATA[
+record          = contact-record / policy-record / expires-record
+contact-record  = "security_contact=" URI
+policy-record   = "security_policy=" URI
+expires-record  = "security_expires=" date-time
+URI             = <URI as defined in Section 3 of RFC 3986>
+date-time       = <date-time as defined in Section 5.6 of RFC 3339>
+]]></sourcecode>
+        <t>A URI field value MUST be an absolute URI as defined by <xref target="RFC3986"/> and MUST contain no fragment component.  A publisher MUST publish at least one <tt>security_contact</tt> record.  A publisher MAY publish multiple contact records and multiple policy records.  Because resource records within an RRset are unordered, publishers MUST NOT use record order to express preference.</t>
+        <t>A <tt>security_contact</tt> URI identifies a channel through which security reports can be initiated.  Publishers MUST support contact by each URI they publish.  Publishers SHOULD use an <tt>https</tt> URI, a <tt>mailto</tt> URI, or both.  Consumers MUST support the <tt>https</tt> and <tt>mailto</tt> schemes and MAY support other schemes.</t>
+        <t>A <tt>security_policy</tt> URI identifies a human-readable vulnerability disclosure or security research policy.  Its scheme MUST be <tt>https</tt>.</t>
+        <t>A publisher MUST publish exactly one <tt>security_expires</tt> record.  Its value indicates the date and time after which the entire Security TXT RRset is considered stale and MUST NOT be used.  The value MUST be a <tt>date-time</tt> conforming to <xref target="RFC3339"/> and MUST express Coordinated Universal Time using the <tt>Z</tt> suffix.  The timestamp MUST be later than the time of publication.  Publishers SHOULD choose a timestamp less than one year in the future, consistent with the freshness guidance in <xref target="RFC9116"/>.</t>
+        <t>TXT RDATA consists of one or more character-strings, each of which is limited to 255 octets by <xref target="RFC1035"/>.  Publishers SHOULD encode each Logical TXT Record as a single character-string of no more than 255 octets.  Consumers MUST correctly concatenate multiple character-strings before parsing.  Consumers MUST support Logical TXT Records of at least 2048 octets and MAY reject longer records.</t>
+      </section>
+
+      <section numbered="true" toc="include" anchor="examples">
+        <name>Examples</name>
+        <t>The following zone-file fragment publishes email and web reporting channels and a vulnerability disclosure policy:</t>
+        <sourcecode name="zone-example" type="dns"><![CDATA[
+_security.example.com. 3600 IN TXT
+  "security_contact=mailto:security@example.com"
+_security.example.com. 3600 IN TXT
+  "security_contact=https://example.com/report-security-issue"
+_security.example.com. 3600 IN TXT
+  "security_policy=https://example.com/security"
+_security.example.com. 3600 IN TXT
+  "security_expires=2027-01-01T00:00:00Z"
+]]></sourcecode>
+        <t>A policy operated by a third party is also permitted:</t>
+        <sourcecode name="third-party-example" type="dns"><![CDATA[
+_security.example.net. 3600 IN TXT
+  "security_contact=https://reports.example.test/example.net"
+_security.example.net. 3600 IN TXT
+  "security_policy=https://policies.example.test/example.net"
+_security.example.net. 3600 IN TXT
+  "security_expires=2027-01-01T00:00:00Z"
+]]></sourcecode>
+      </section>
+    </section>
+
+    <section numbered="true" toc="include" anchor="discovery">
+      <name>Discovery and Processing</name>
+      <ol type="1">
+        <li>An application determines a Reference Domain using application-specific information or user input.</li>
+        <li>The application constructs the owner name by prepending <tt>_security.</tt> to the Reference Domain and queries for the IN TXT RRset.</li>
+        <li>For each TXT resource record in the answer, the application concatenates its character-strings to form one Logical TXT Record.</li>
+        <li>The application processes records whose field name is <tt>security_contact</tt>, <tt>security_policy</tt>, or <tt>security_expires</tt> and ignores TXT records with unrecognized field names.</li>
+        <li>The application validates each URI according to <xref target="record-format"/>.  An invalid record is ignored without invalidating other records in the RRset.</li>
+        <li>The application verifies that exactly one <tt>security_expires</tt> field occurred, that its value is valid, and that the current time is earlier than its value.  Otherwise, discovery fails and none of the RRset's contact or policy information is used.</li>
+      </ol>
+      <t>If the RRset contains no valid <tt>security_contact</tt> record, discovery has not succeeded.  A policy URI by itself is not a reporting channel.  A consumer MUST check <tt>security_expires</tt> each time it uses cached information; the DNS TTL does not extend the stated expiration time.</t>
+      <t>A consumer MUST NOT automatically walk toward the DNS root in search of a record unless it has an independently configured administrative boundary.  DNS labels do not reliably identify organizational boundaries, and unrestricted walking could apply a record belonging to a public suffix or an unrelated parent.</t>
+      <t>Normal DNS alias processing applies.  Consumers SHOULD honor DNS TTLs and negative caching.  A DNSSEC validation result of Bogus MUST be treated as a discovery failure; a consumer MUST NOT use the affected data.  Data from an unsigned zone remains useful for discovery but is not cryptographically authenticated.</t>
+    </section>
+
+    <section numbered="true" toc="include" anchor="securitytxt">
+      <name>Relationship to security.txt</name>
+      <t>This mechanism complements, rather than replaces, <tt>security.txt</tt> <xref target="RFC9116"/>.  A Security TXT RRset is scoped to its Reference Domain.  A <tt>security.txt</tt> file is scoped according to RFC 9116 and can provide more detailed, service-specific information.</t>
+      <t>Publishers SHOULD keep the two mechanisms consistent when both are used.  When valid results differ, consumers SHOULD present all applicable contact information and SHOULD indicate the inconsistency.  Consumers MUST NOT infer that either source authorizes security testing.  Authorization, safe-harbor terms, and rules of engagement exist only when explicitly stated by an applicable policy.</t>
+    </section>
+
+    <section numbered="true" toc="include" anchor="operational">
+      <name>Operational Considerations</name>
+      <t>Security contact information becomes harmful when it is stale.  Publishers SHOULD monitor contact channels, test them periodically, update records before retiring a channel, and refresh <tt>security_expires</tt> only after confirming that the published contacts and policies remain correct.  Publishers SHOULD use TTLs that permit timely change and SHOULD avoid a TTL that would retain the RRset beyond its stated expiration time.  Third-party reporting services SHOULD be named only with the service provider's agreement.</t>
+      <t>Publishers SHOULD keep the RRset small to reduce the likelihood of UDP truncation, fallback to another DNS transport, or amplification.  Large policy text, public keys, and instructions do not belong in this RRset; records contain URIs that refer to those resources.</t>
+      <t>Organizations with different policies for delegated subdomains MAY publish distinct Security TXT RRsets for those Reference Domains.  The existence of a record at a parent does not automatically make it applicable to a child domain; that relationship is determined by the application selecting the Reference Domain.</t>
+    </section>
+
+    <section numbered="true" toc="include" anchor="security-considerations">
+      <name>Security Considerations</name>
+      <t>An attacker who can alter DNS answers can redirect vulnerability reports, learn that a vulnerability was discovered, collect sensitive technical details, or suppress a legitimate contact.  DNSSEC validation provides origin authentication and integrity for DNS data but does not make a listed contact trustworthy or guarantee that the contact endpoint is uncompromised.  Publishers are therefore RECOMMENDED to sign the relevant zone with DNSSEC, and consumers are RECOMMENDED to perform DNSSEC validation.</t>
+      <t>For <tt>https</tt> URIs, consumers MUST perform normal TLS certificate and hostname validation.  Consumers SHOULD clearly display the destination before transmitting a report, particularly when the URI's authority differs from the Reference Domain.</t>
+      <t>A record is not authorization to probe, test, access, or modify systems.  The presence of <tt>security_policy</tt> only identifies a policy document; consumers and researchers remain responsible for reading it and determining whether it applies.</t>
+      <t>DNS responses can be spoofed, replayed until their TTL expires, truncated, or blocked.  Implementations need bounded parsing, URI-length limits, DNSSEC failure handling, and user-visible error reporting.  Consumers MUST NOT treat a DNSSEC Bogus response as equivalent to an unsigned response or to absence of a record.</t>
+      <t>The <tt>security_expires</tt> field limits reliance on stale or replayed data, including data retained outside normal DNS caching.  It is not a substitute for DNSSEC and does not prevent replay before the stated time.  Consumers require a sufficiently accurate clock to evaluate the field and MUST fail discovery when they cannot determine whether the RRset has expired.</t>
+      <t>Publishing a mailbox can attract spam and malicious reports.  Publishers can instead use an HTTPS form, filtering, or a dedicated reporting platform, but contact mechanisms should not impose barriers that prevent good-faith vulnerability reports.</t>
+    </section>
+
+    <section numbered="true" toc="include" anchor="privacy-considerations">
+      <name>Privacy Considerations</name>
+      <t>DNS queries can reveal that a user or automated tool is seeking a security contact for a domain.  Recursive resolvers, authoritative servers, and on-path observers may be able to associate such queries with a source.  Encrypted DNS transport can reduce disclosure to on-path observers but does not hide the query from the resolver or authoritative server.</t>
+      <t>Contact URIs are public.  Publishers SHOULD use role accounts or purpose-built endpoints instead of personal addresses.  Consumers SHOULD avoid placing vulnerability details in URI query components because URIs may be logged by DNS-independent intermediaries and HTTP systems.</t>
+    </section>
+
+    <section numbered="true" toc="include" anchor="iana">
+      <name>IANA Considerations</name>
+      <t>Per <xref target="RFC8552"/>, IANA is requested to add the following entry to the "Underscored and Globally Scoped DNS Node Names" registry:</t>
+      <table anchor="iana-underscore-registration">
+        <name>Underscored DNS Node Name Registration</name>
+        <thead>
+          <tr><th>RR Type</th><th>_NODE NAME</th><th>Reference</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>TXT</td><td>_security</td><td>This document</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section numbered="true" toc="include" anchor="acknowledgements">
+      <name>Acknowledgements</name>
+      <t>This mechanism was first published by the authors as the DNS Security TXT proposal in March 2021 as part of the disclose.io Project.  The authors thank the security researchers, defenders, and vulnerability disclosure practitioners who provided early feedback.</t>
+    </section>
+
+    <section numbered="true" toc="include" anchor="implementation-status" removeInRFC="true">
+      <name>Implementation Status</name>
+      <t>This section is to be completed with known publisher and consumer implementations before working-group adoption.  It is intended to be removed before publication as an RFC.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references>
+      <name>Normative References</name>
+      <reference anchor="RFC1035" target="https://www.rfc-editor.org/info/rfc1035">
+        <front><title>Domain Names - Implementation and Specification</title><author fullname="Paul Mockapetris"/><date month="November" year="1987"/></front>
+        <seriesInfo name="STD" value="13"/><seriesInfo name="RFC" value="1035"/><seriesInfo name="DOI" value="10.17487/RFC1035"/>
+      </reference>
+      <reference anchor="RFC2119" target="https://www.rfc-editor.org/info/rfc2119">
+        <front><title>Key words for use in RFCs to Indicate Requirement Levels</title><author fullname="Scott Bradner"/><date month="March" year="1997"/></front>
+        <seriesInfo name="BCP" value="14"/><seriesInfo name="RFC" value="2119"/><seriesInfo name="DOI" value="10.17487/RFC2119"/>
+      </reference>
+      <reference anchor="RFC3986" target="https://www.rfc-editor.org/info/rfc3986">
+        <front><title>Uniform Resource Identifier (URI): Generic Syntax</title><author fullname="Tim Berners-Lee"/><author fullname="Roy Fielding"/><author fullname="Larry Masinter"/><date month="January" year="2005"/></front>
+        <seriesInfo name="STD" value="66"/><seriesInfo name="RFC" value="3986"/><seriesInfo name="DOI" value="10.17487/RFC3986"/>
+      </reference>
+      <reference anchor="RFC3339" target="https://www.rfc-editor.org/info/rfc3339">
+        <front><title>Date and Time on the Internet: Timestamps</title><author fullname="Graham Klyne"/><author fullname="Chris Newman"/><date month="July" year="2002"/></front>
+        <seriesInfo name="RFC" value="3339"/><seriesInfo name="DOI" value="10.17487/RFC3339"/>
+      </reference>
+      <reference anchor="RFC5234" target="https://www.rfc-editor.org/info/rfc5234">
+        <front><title>Augmented BNF for Syntax Specifications: ABNF</title><author fullname="Dave Crocker"/><author fullname="Paul Overell"/><date month="January" year="2008"/></front>
+        <seriesInfo name="STD" value="68"/><seriesInfo name="RFC" value="5234"/><seriesInfo name="DOI" value="10.17487/RFC5234"/>
+      </reference>
+      <reference anchor="RFC8174" target="https://www.rfc-editor.org/info/rfc8174">
+        <front><title>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</title><author fullname="Barry Leiba"/><date month="May" year="2017"/></front>
+        <seriesInfo name="BCP" value="14"/><seriesInfo name="RFC" value="8174"/><seriesInfo name="DOI" value="10.17487/RFC8174"/>
+      </reference>
+      <reference anchor="RFC8552" target="https://www.rfc-editor.org/info/rfc8552">
+        <front><title>Scoped Interpretation of DNS Resource Records through "Underscored" Naming of Attribute Leaves</title><author fullname="Dave Crocker"/><date month="March" year="2019"/></front>
+        <seriesInfo name="BCP" value="222"/><seriesInfo name="RFC" value="8552"/><seriesInfo name="DOI" value="10.17487/RFC8552"/>
+      </reference>
+    </references>
+    <references>
+      <name>Informative References</name>
+      <reference anchor="RFC9116" target="https://www.rfc-editor.org/info/rfc9116">
+        <front><title>A File Format to Aid in Security Vulnerability Disclosure</title><author fullname="Edwin Foudil"/><author fullname="Yakov Shafranovich"/><date month="April" year="2022"/></front>
+        <seriesInfo name="RFC" value="9116"/><seriesInfo name="DOI" value="10.17487/RFC9116"/>
+      </reference>
+    </references>
+
+    <section numbered="true" toc="include" anchor="legacy">
+      <name>Legacy Deployment and Migration</name>
+      <t>The 2021 pre-standard DNS Security TXT proposal permitted records at either <tt>_security.example.com</tt> or the domain apex and suggested that consumers use the apex as a fallback.  This specification removes the apex fallback because apex TXT RRsets commonly contain unrelated records, the fallback complicates negative caching and authentication decisions, and the underscored name provides explicit protocol scoping.</t>
+      <t>Operators of pre-standard deployments SHOULD add a <tt>security_expires</tt> record, copy all records to <tt>_security</tt>, and then remove the apex copies after an appropriate transition period.  Consumers MAY provide an explicitly labeled legacy mode that reads <tt>security_contact</tt> and <tt>security_policy</tt> records from the apex, but legacy mode is outside the interoperability requirements of this specification and SHOULD NOT be enabled by default.  Consumers MUST NOT synthesize an expiration time for normative <tt>_security</tt> deployments that omit <tt>security_expires</tt>.</t>
+    </section>
+
+    <section numbered="true" toc="include" anchor="changes" removeInRFC="true">
+      <name>Change Log</name>
+      <section numbered="true" toc="include">
+        <name>Since the 2021 Web Proposal</name>
+        <ul>
+          <li>Defined a single normative owner name, <tt>_security</tt>, and requested its IANA registration.</li>
+          <li>Removed apex fallback from the normative discovery algorithm.</li>
+          <li>Defined parsing, URI validation, DNSSEC failure handling, size limits, and administrative-boundary behavior.</li>
+          <li>Added the required <tt>security_expires</tt> field, using RFC 3339 UTC timestamps and freshness semantics aligned with RFC 9116.</li>
+          <li>Clarified the relationship with RFC 9116 and that publication does not authorize security testing.</li>
+          <li>Added operational, security, and privacy considerations.</li>
+        </ul>
+      </section>
+    </section>
+  </back>
+</rfc>
