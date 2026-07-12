@@ -18,7 +18,6 @@ xml2rfc --v3 --text --html draft-ellis-dns-security-contact-00.xml
 ```
 
 The checked-in text and HTML outputs must be regenerated whenever the RFCXML source changes.
-The public-site reader at `docs/draft-ellis-dns-security-contact-00.html` is also generated from the same RFCXML source and must be refreshed at the same time.
 
 ## Status
 
