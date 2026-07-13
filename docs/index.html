@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNS Security TXT &middot; disclose.io</title>
+<meta name="description" content="A standard for nominating security contact points and policies via DNS TXT records, discoverable before a researcher even loads your site. Part of the disclose.io Project.">
+<link rel="canonical" href="https://dnssecuritytxt.org/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='200' cy='200' r='200' fill='%23673AB6'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:title" content="DNS Security TXT">
+<meta property="og:description" content="A standard for nominating security contact points and policies via DNS TXT records, discoverable before a researcher even loads your site.">
+<meta property="og:url" content="https://dnssecuritytxt.org/">
+<meta property="og:image" content="https://dnssecuritytxt.org/marquee.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@dnssecuritytxt">
+<!-- GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GLJF09Y0DB"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-GLJF09Y0DB');</script>
+<style>
+:root{
+  --bg:#ffffff; --bg-alt:#faf7ff; --bg-tint:#f3f0ff; --bg-deep:#ede9fe;
+  --ink:#0f172a; --muted:#64748b; --shade:#f1f5f9;
+  --accent:#673AB6; --accent-deep:#4c1d95; --line:#e5e7eb;
+  --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:var(--font); line-height:1.55; -webkit-font-smoothing:antialiased; overflow-x:hidden;}
+::selection{background:#ddd6fe; color:#1e1b4b;}
+a{color:var(--accent); text-decoration:none;}
+a:hover{text-decoration:underline;}
+code{font-family:var(--mono); font-size:.92em; background:var(--bg-tint); color:var(--accent-deep); padding:1px 5px; border-radius:5px; overflow-wrap:anywhere;}
+
+/* nav */
+.nav{position:sticky; top:0; z-index:50; background:rgba(255,255,255,.9); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+.nav .in{max-width:1080px; margin:0 auto; padding:12px 24px; display:flex; align-items:center; gap:10px 20px; flex-wrap:wrap;}
+.brand{display:flex; align-items:center; gap:9px; font-weight:800; letter-spacing:-.01em; color:var(--ink);}
+.brand:hover{text-decoration:none;}
+.brand svg{width:26px; height:26px; display:block;}
+.brand .sub{color:var(--muted); font-weight:600; font-size:13px;}
+.nav .links{margin-left:auto; display:flex; gap:4px 18px; flex-wrap:wrap; align-items:center;}
+.nav .links a{font-size:12.5px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.06em;}
+.nav .links a:hover{color:var(--accent);}
+
+/* layout */
+section{padding:66px 24px;}
+section.alt{background:var(--bg-alt);}
+.wrap{max-width:1080px; margin:0 auto;}
+.eyebrow{font-size:13px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); font-weight:600; margin-bottom:16px;}
+h1{font-size:clamp(38px,6vw,66px); line-height:1.03; letter-spacing:-.03em; font-weight:800;}
+h1 .dot{color:var(--accent);}
+h2{font-size:clamp(26px,3.4vw,40px); line-height:1.12; letter-spacing:-.02em; font-weight:800; margin-bottom:10px;}
+h3{font-size:19px; font-weight:700; letter-spacing:-.01em; margin-bottom:6px;}
+.lede{font-size:clamp(17px,2vw,21px); color:var(--muted); max-width:640px; margin:20px 0 0; line-height:1.5;}
+.sec-lede{font-size:16.5px; color:var(--muted); max-width:720px; margin-bottom:30px;}
+p{margin:0 0 14px;} p:last-child{margin-bottom:0;}
+.body p{font-size:16px; max-width:720px;}
+
+/* hero */
+#hero{padding-top:76px; padding-bottom:60px;}
+.cta{display:flex; gap:12px; flex-wrap:wrap; margin-top:32px;}
+.btn{display:inline-flex; align-items:center; gap:8px; font-weight:700; font-size:15px; padding:12px 22px; border-radius:11px; border:1.5px solid var(--accent);}
+.btn:hover{text-decoration:none;}
+.btn.primary{background:var(--accent); color:#fff;} .btn.primary:hover{background:var(--accent-deep); border-color:var(--accent-deep);}
+.btn.ghost{color:var(--accent); background:transparent;} .btn.ghost:hover{background:var(--bg-tint);}
+.attrib{margin-top:30px; font-size:14px; color:var(--muted);}
+
+/* ecosystem strip */
+.eco{display:flex; gap:12px; flex-wrap:wrap; margin-top:34px;}
+.eco a{display:flex; flex-direction:column; gap:2px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:13px 18px; min-width:210px; flex:1;}
+.eco a:hover{border-color:var(--accent); text-decoration:none;}
+.eco .k{font-weight:700; color:var(--ink); font-size:14.5px;}
+.eco .v{font-size:12.5px; color:var(--muted);}
+
+/* cards */
+.cards{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:8px;}
+.card{background:#fff; border:1px solid var(--line); border-radius:16px; padding:22px 22px;}
+.card p{font-size:14.5px; color:var(--muted); margin:0;}
+
+/* fields */
+.field{background:#fff; border:1px solid var(--line); border-radius:16px; padding:22px 24px; margin-top:16px;}
+.field .tag{display:inline-block; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; padding:3px 9px; border-radius:6px; margin-left:8px; vertical-align:middle;}
+.tag.req{background:var(--accent); color:#fff;} .tag.opt{background:var(--shade); color:var(--muted);}
+.field ul{margin:10px 0 0 0; padding-left:20px;} .field li{font-size:14.5px; color:var(--muted); margin:5px 0;}
+
+/* deploy */
+.rec{background:var(--bg-tint); border:1px solid var(--bg-deep); border-radius:8px; padding:2px 9px; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent-deep);}
+.callout{background:var(--bg-tint); border:1px solid var(--bg-deep); border-left:4px solid var(--accent); border-radius:12px; padding:16px 20px; margin:0 0 26px; font-size:14.5px; line-height:1.55; color:var(--ink);}
+.callout b{color:var(--accent-deep);}
+.callout .ct{display:block; font-weight:700; color:var(--accent-deep); margin-bottom:4px;}
+.deploy-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:8px;}
+.pc{font-size:14px; color:var(--muted); margin:8px 0;} .pc b{color:var(--ink);}
+.tbl-wrap{overflow-x:auto; margin-top:14px; border:1px solid var(--line); border-radius:12px;}
+table{width:100%; border-collapse:collapse; font-size:13px; min-width:520px;}
+th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:700; padding:11px 14px; border-bottom:1px solid var(--line); background:var(--bg-alt);}
+td{padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top;} tr:last-child td{border-bottom:none;}
+td code{white-space:nowrap;}
+
+/* in the wild */
+.adopters{display:grid; gap:14px; margin-top:8px;}
+.adopter{background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 22px; display:grid; grid-template-columns:200px 1fr; gap:6px 24px; align-items:baseline;}
+.adopter .org{font-weight:800; font-size:17px;}
+.adopter .who{font-size:13px; color:var(--muted); margin-top:2px;}
+.adopter .rec{background:var(--bg-tint); border-radius:8px; padding:9px 12px; font-family:var(--mono); font-size:12.5px; color:var(--accent-deep); overflow-x:auto; white-space:nowrap;}
+.wild-note{font-size:14px; color:var(--muted); margin-top:20px;}
+
+/* faq */
+.faq{display:grid; gap:12px; margin-top:8px;}
+.qa{background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 22px;}
+.qa .q{font-weight:700; font-size:16px; margin-bottom:8px;}
+.qa .a{font-size:14.5px; color:var(--muted);} .qa .a p{font-size:14.5px; margin:0 0 8px;} .qa .a p:last-child{margin:0;}
+
+/* footer */
+footer{background:var(--ink); color:#cbd5e1; padding:52px 24px;}
+footer .wrap{display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:30px;}
+footer h4{color:#fff; font-size:12px; text-transform:uppercase; letter-spacing:.1em; margin-bottom:14px;}
+footer a{color:#cbd5e1;} footer a:hover{color:#fff;}
+footer .fl{display:block; font-size:14px; margin:7px 0;}
+footer .about{font-size:14px; line-height:1.6;}
+footer .about .fbrand{display:flex; align-items:center; gap:9px; margin-bottom:12px; color:#fff; font-weight:800;}
+footer .about .fbrand svg{width:24px; height:24px;}
+footer .copy{max-width:1080px; margin:34px auto 0; padding-top:20px; border-top:1px solid #1e293b; font-size:12.5px; color:#64748b;}
+
+@media (max-width:760px){
+  .cards{grid-template-columns:1fr;}
+  .deploy-grid{grid-template-columns:1fr;}
+  .adopter{grid-template-columns:1fr; gap:8px;}
+  footer .wrap{grid-template-columns:1fr; gap:24px;}
+  .nav .links{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- disclose.io mark, reused inline -->
+<nav class="nav">
+  <div class="in">
+    <a class="brand" href="/">
+      <svg viewBox="0 0 400 400" aria-hidden="true"><path fill="#673AB6" d="M200 0C89.5 0 0 89.5 0 200s89.5 200 200 200 200-89.5 200-200S310.5 0 200 0z"></path><path fill="#FFF" d="M241.5 279.4h-71c-9.4 0-18.3-3.7-25-10.3l-18.9-18.9c-3.9-3.9-9.3-5.7-14.7-5l-52.8 6.6C53.2 235.6 50 218.2 50 200c0-15.4 2.3-30.2 6.6-44.1h56.7c4.7 0 9.2-1.9 12.5-5.2l25.4-25.4c3-3 7.1-4.7 11.4-4.7h20.2l-35.5 35.5c-5.8 5.8-9 13.6-9 21.8 0 11.5 6.2 22 17.1 27.7 1.1.6 2.3 1.1 3.5 1.5 11 3.6 22.1 1.2 30.2-5.6l59.9 59.8c6.6 6.7 1.9 18.1-7.5 18.1z"></path><path fill="#FFF" d="M340.8 251.8l-52.8-6.6c-5.4-.7-10.8 1.2-14.7 5l-5.3 5.3-66.4-66.4 14-14c3.4-3.4 3.4-9 0-12.4-3.5-3.5-9.1-3.5-12.6 0l-24.6 24.6c-2.6 2.6-6 3.9-9.4 3.9s-6.8-1.3-9.4-3.9c-5.2-5.2-5.2-13.5 0-18.7l42.8-42.8c3.3-3.3 7.8-5.2 12.5-5.2h21.7c4.7 0 9.2 1.9 12.5 5.2l25 25c3.3 3.3 7.8 5.2 12.5 5.2h56.7c4.3 13.9 6.6 28.8 6.6 44.1.1 18.1-3.1 35.5-9.1 51.7z"></path></svg>
+      <span>dnssecuritytxt</span>
+    </a>
+    <div class="links">
+      <a href="#summary">The standard</a>
+      <a href="#fields">Fields</a>
+      <a href="#deploy">Deploy</a>
+      <a href="#wild">In the wild</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/disclose/dnssecuritytxt">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="wrap">
+    <p class="eyebrow">The disclose.io Project</p>
+    <h1>DNS Security TXT</h1>
+    <p class="lede">A standard for nominating security contact points and policies via DNS TXT records, discoverable before a researcher even loads your site.</p>
+    <div class="cta">
+      <a class="btn primary" href="#deploy">Deploy it</a>
+      <a class="btn ghost" href="https://github.com/disclose/dnssecuritytxt">Read the draft</a>
+    </div>
+    <p class="attrib">Created by <a href="https://twitter.com/yosignals">John Carroll</a> and <a href="https://twitter.com/caseyjohnellis">Casey Ellis</a> for the disclose.io Project. Currently a draft standard; feedback welcome via <a href="https://github.com/disclose/dnssecuritytxt/issues">GitHub</a>.</p>
+    <div class="eco">
+      <a href="https://lookup.disclose.io"><span class="k">lookup.disclose.io</span><span class="v">Resolve any asset to its security contact</span></a>
+      <a href="https://directory.disclose.io"><span class="k">directory.disclose.io</span><span class="v">Browse disclosure programs and safe harbor</span></a>
+      <a href="https://disclose.io"><span class="k">disclose.io</span><span class="v">Open standards for vulnerability disclosure</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section id="summary" class="alt">
+  <div class="wrap body">
+    <p class="eyebrow">Summary</p>
+    <h2>The report channel, published in DNS</h2>
+    <p>When people find security issues in Internet-facing systems, the correct channel to report them isn't always clear, and the relevant disclosure policy for the system isn't always apparent. DNS Security TXT extends the work done by security.txt to answer this question using DNS, arguably the most ubiquitous system on the Internet.</p>
+    <p>When deployed, it gives security researchers, Internauts, and concerned Internet citizens clear and authoritative direction to the correct channels for reporting security issues, and to the policies an organization sets out for all systems under a domain.</p>
+  </div>
+</section>
+
+<!-- WHY -->
+<section id="why">
+  <div class="wrap">
+    <p class="eyebrow">Why DNS</p>
+    <h2>Authoritative, centralized, visible</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Authoritative</h3>
+        <p>Using DNS TXT to establish authorization from a domain is common practice. DNS records speak for the organization, not just an individual server or app owner, which creates confidence in the reporting and policy information they carry. A DNS Security TXT record does not itself authorize testing; authorization or safe-harbor terms must be stated explicitly in the linked policy.</p>
+      </div>
+      <div class="card">
+        <h3>Centralized</h3>
+        <p>DNS management is centralized, so these records are simple to deploy, update, maintain, and remove. It removes reliance on individual owners to publish and maintain separate files.</p>
+      </div>
+      <div class="card">
+        <h3>Visible</h3>
+        <p>DNS is core to how the Internet operates, and interrogating DNS is a fundamental footprinting step in penetration tests and automated scans, so the correct contact and policy details are less likely to be missed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FIELDS -->
+<section id="fields" class="alt">
+  <div class="wrap">
+    <p class="eyebrow">Fields</p>
+    <h2>Two fields, one record format</h2>
+    <p class="sec-lede">Each field is a separate TXT record in the form <code>field_name=value</code>.</p>
+    <div class="field">
+      <h3 style="display:inline">security_contact<span class="tag req">Required</span></h3>
+      <ul>
+        <li>A link to a web form or an email address for people to contact you about security issues.</li>
+        <li>Include <code>https://</code> for URLs and <code>mailto:</code> for email.</li>
+        <li>Deploy two separate records if both a web form and an email are needed.</li>
+        <li>Examples: <code>https://example.com/report-security-issue</code>, <code>mailto:security@example.com</code></li>
+      </ul>
+    </div>
+    <div class="field">
+      <h3 style="display:inline">security_policy<span class="tag opt">Optional</span></h3>
+      <ul>
+        <li>A link to a policy detailing what finders should expect when reporting, and what researchers should do when looking for issues.</li>
+        <li>Include <code>https://</code>.</li>
+        <li>Examples: <code>https://example.com/security</code>, <code>https://bugcrowd.com/domain</code></li>
+      </ul>
+    </div>
+    <div class="field">
+      <h3 style="display:inline">security_expires<span class="tag req">Required, exactly once</span></h3>
+      <ul>
+        <li>An RFC 3339 timestamp indicating when all contact and policy information in the record set becomes stale and must no longer be used.</li>
+        <li>Use Coordinated Universal Time with the <code>Z</code> suffix, and set it in the future when published.</li>
+        <li>Choose a timestamp less than one year out, consistent with RFC 9116. A longer DNS TTL cannot extend it.</li>
+        <li>Example: <code>2027-01-01T00:00:00Z</code></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- DEPLOY -->
+<section id="deploy">
+  <div class="wrap">
+    <p class="eyebrow">Deployment</p>
+    <h2>Where the records live</h2>
+    <p class="sec-lede">The proposed IETF specification defines <code>_security.example.com</code> as the sole normative owner name. Clients query <code>_security</code>; they do not fall back to the apex or walk toward the DNS root. Per-host HTTP details can still live in that host's <code>/.well-known/security.txt</code> under RFC 9116.</p>
+    <div class="callout">
+      <span class="ct">Already publishing at the apex?</span>
+      You are in good company: many early adopters put their record at the domain apex under the 2021 proposal, and those records still resolve today. Nothing breaks. When you are ready, move to <code>_security</code> at your own pace: add <code>security_expires</code>, copy your records to <code>_security.yourdomain</code>, and retire the apex copies after a transition period.
+    </div>
+    <div class="deploy-grid">
+      <div>
+        <h3><code>_security.example.com</code> <span class="rec">Normative</span></h3>
+        <p class="pc"><b>Pros:</b> maintains apex zone hygiene, supports future options without cluttering the apex, and follows the established underscored-name convention (<code>_dmarc</code>, <code>_mta-sts</code>, <code>_bimi</code>) per RFC 8552.</p>
+        <p class="pc"><b>Cons:</b> less visible than the apex, and users need to know about the <code>_security</code> subdomain.</p>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Description</th><th>Type</th><th>Content</th></tr></thead>
+          <tbody>
+            <tr><td>Direct email contact</td><td>TXT</td><td><code>security_contact=mailto:security@example.com</code></td></tr>
+            <tr><td>Direct web form contact</td><td>TXT</td><td><code>security_contact=https://example.com/report</code></td></tr>
+            <tr><td>Policy URL</td><td>TXT</td><td><code>security_policy=https://example.com/security-policy</code></td></tr>
+            <tr><td>Expiration timestamp</td><td>TXT</td><td><code>security_expires=2027-01-01T00:00:00Z</code></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div>
+        <h3>Legacy apex deployments</h3>
+        <p class="pc">The 2021 proposal allowed apex records as a discovery fallback. The proposed IETF specification removes that behavior, because apex TXT record sets commonly contain unrelated protocols and do not provide explicit scoping.</p>
+        <p class="pc"><b>Migrating?</b> Add <code>security_expires</code>, copy all DNS Security TXT records to <code>_security</code>, and remove the apex copies after an appropriate transition period. Clients may offer an explicitly labeled legacy mode, but it should not be enabled by default.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IN THE WILD -->
+<section id="wild" class="alt">
+  <div class="wrap">
+    <p class="eyebrow">In the wild</p>
+    <h2>Organizations publishing it today</h2>
+    <p class="sec-lede">A sample of the organizations already resolving to a security contact through DNS Security TXT. Each record below is live and can be verified with a single <code>dig</code>.</p>
+    <div class="adopters">
+      <div class="adopter">
+        <div><div class="org">gov.uk</div><div class="who">The UK government's central vulnerability reporting service</div></div>
+        <div class="rec">_security.gov.uk TXT "security_contact=https://vulnerability-reporting.service.security.gov.uk"</div>
+      </div>
+      <div class="adopter">
+        <div><div class="org">ethereum.org</div><div class="who">The Ethereum Foundation</div></div>
+        <div class="rec">_security.ethereum.org TXT "security_contact=https://bounty.ethereum.org"</div>
+      </div>
+      <div class="adopter">
+        <div><div class="org">fortinet.com</div><div class="who">Global cybersecurity vendor, FortiGuard PSIRT</div></div>
+        <div class="rec">_security.fortinet.com TXT "security_contact=https://www.fortiguard.com/faq/psirt-contact"</div>
+      </div>
+      <div class="adopter">
+        <div><div class="org">a16z.com</div><div class="who">Andreessen Horowitz</div></div>
+        <div class="rec">_security.a16z.com TXT "security_contact=mailto:cirt@a16z.com"</div>
+      </div>
+      <div class="adopter">
+        <div><div class="org">shodan.io</div><div class="who">The Shodan search engine</div></div>
+        <div class="rec">_security.shodan.io TXT "security_contact=mailto:security@shodan.io"</div>
+      </div>
+    </div>
+    <p class="wild-note">Resolve any domain's security contact yourself at <a href="https://lookup.disclose.io">lookup.disclose.io</a>.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="wrap">
+    <p class="eyebrow">FAQ</p>
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      <div class="qa">
+        <div class="q">Is this a replacement for security.txt?</div>
+        <div class="a">
+          <p>It can be, but it doesn't need to be. security.txt works well for individual hosts or hosts only addressable by IP, with DNS Security TXT providing directions from the parent domain. The two mechanisms have different scopes and authentication properties: security.txt can describe a specific HTTP service, while DNS Security TXT provides information for a selected reference domain.</p>
+          <p>If valid results disagree, clients should present all applicable contact information and highlight the inconsistency rather than applying a universal precedence rule. Publishers should keep both mechanisms consistent. A DNS record in an unsigned zone remains useful for discovery but is not cryptographically authenticated, and a DNSSEC result of Bogus must not be used.</p>
+        </div>
+      </div>
+      <div class="qa">
+        <div class="q">Why is security_expires required?</div>
+        <div class="a">
+          <p>Stale contact information can misdirect sensitive vulnerability reports or cause them to be lost entirely. The field follows the freshness model of RFC 9116: it appears exactly once, uses an RFC 3339 timestamp, and marks the point after which the entire record set must not be used. Clients check the timestamp whenever they use cached information, and a longer DNS TTL cannot extend it.</p>
+        </div>
+      </div>
+      <div class="qa">
+        <div class="q">Is this giving anyone permission to hack my organization?</div>
+        <div class="a">
+          <p>No. It provides a place for people to send security reports if they find something. Pair a <code>security_policy</code> with the <code>security_contact</code> to set expectations and rules of engagement. The <a href="https://github.com/disclose/dioterms">disclose.io dioterms repository</a> provides boilerplates to get you started.</p>
+        </div>
+      </div>
+      <div class="qa">
+        <div class="q">Can I deploy this on a subdomain?</div>
+        <div class="a">
+          <p>Yes. While we strongly recommend the root domain, the standard supports subdomains and even individual hosts. That is useful when contact or policy details differ across departments, or when a department has a disclosure policy the parent organization does not.</p>
+        </div>
+      </div>
+      <div class="qa">
+        <div class="q">Who do I need to engage to get these records in place?</div>
+        <div class="a">
+          <p>It depends on the size of your organization and who maintains DNS. The engineering or IT team is usually a good place to start, and the security team will understand the reason for adding the records.</p>
+        </div>
+      </div>
+      <div class="qa">
+        <div class="q">Will adding an email address expose me to spam?</div>
+        <div class="a">
+          <p>Email is optional. If you are worried about unsolicited mail, set a URI as the value and link to your security policy and a web form for reporting instead.</p>
+        </div>
+      </div>
+      <div class="qa">
+        <div class="q">How do I put these entries into my DNS?</div>
+        <div class="a">
+          <p>Searching "how to add TXT records to DNS" together with your DNS provider or system will point you to the right steps.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="about">
+      <div class="fbrand">
+        <svg viewBox="0 0 400 400" aria-hidden="true"><path fill="#673AB6" d="M200 0C89.5 0 0 89.5 0 200s89.5 200 200 200 200-89.5 200-200S310.5 0 200 0z"></path><path fill="#FFF" d="M241.5 279.4h-71c-9.4 0-18.3-3.7-25-10.3l-18.9-18.9c-3.9-3.9-9.3-5.7-14.7-5l-52.8 6.6C53.2 235.6 50 218.2 50 200c0-15.4 2.3-30.2 6.6-44.1h56.7c4.7 0 9.2-1.9 12.5-5.2l25.4-25.4c3-3 7.1-4.7 11.4-4.7h20.2l-35.5 35.5c-5.8 5.8-9 13.6-9 21.8 0 11.5 6.2 22 17.1 27.7 1.1.6 2.3 1.1 3.5 1.5 11 3.6 22.1 1.2 30.2-5.6l59.9 59.8c6.6 6.7 1.9 18.1-7.5 18.1z"></path><path fill="#FFF" d="M340.8 251.8l-52.8-6.6c-5.4-.7-10.8 1.2-14.7 5l-5.3 5.3-66.4-66.4 14-14c3.4-3.4 3.4-9 0-12.4-3.5-3.5-9.1-3.5-12.6 0l-24.6 24.6c-2.6 2.6-6 3.9-9.4 3.9s-6.8-1.3-9.4-3.9c-5.2-5.2-5.2-13.5 0-18.7l42.8-42.8c3.3-3.3 7.8-5.2 12.5-5.2h21.7c4.7 0 9.2 1.9 12.5 5.2l25 25c3.3 3.3 7.8 5.2 12.5 5.2h56.7c4.3 13.9 6.6 28.8 6.6 44.1.1 18.1-3.1 35.5-9.1 51.7z"></path></svg>
+        disclose<span style="color:var(--accent)">.io</span>
+      </div>
+      Open, vendor-neutral infrastructure for vulnerability disclosure. DNS Security TXT is a draft standard; feedback is welcome.
+    </div>
+    <div>
+      <h4>Standard</h4>
+      <a class="fl" href="https://github.com/disclose/dnssecuritytxt">GitHub repository</a>
+      <a class="fl" href="https://github.com/disclose/dnssecuritytxt/issues">Suggest a change</a>
+      <a class="fl" href="https://twitter.com/dnssecuritytxt">@dnssecuritytxt</a>
+    </div>
+    <div>
+      <h4>Ecosystem</h4>
+      <a class="fl" href="https://lookup.disclose.io">lookup.disclose.io</a>
+      <a class="fl" href="https://directory.disclose.io">directory.disclose.io</a>
+      <a class="fl" href="https://disclose.io">disclose.io</a>
+    </div>
+  </div>
+  <div class="copy">Created with &lt;3 by John Carroll and Casey Ellis for the disclose.io Project. Copyright 2018 to 2026 disclose.io.</div>
+</footer>
+
+</body>
+</html>
