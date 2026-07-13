@@ -212,6 +212,15 @@ footer .copy{max-width:1080px; margin:34px auto 0; padding-top:20px; border-top:
         <li>Examples: <code>https://example.com/security</code>, <code>https://bugcrowd.com/domain</code></li>
       </ul>
     </div>
+    <div class="field">
+      <h3 style="display:inline">security_expires<span class="tag req">Required, exactly once</span></h3>
+      <ul>
+        <li>An RFC 3339 timestamp indicating when all contact and policy information in the record set becomes stale and must no longer be used.</li>
+        <li>Use Coordinated Universal Time with the <code>Z</code> suffix, and set it in the future when published.</li>
+        <li>Choose a timestamp less than one year out, consistent with RFC 9116. A longer DNS TTL cannot extend it.</li>
+        <li>Example: <code>2027-01-01T00:00:00Z</code></li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -220,10 +229,10 @@ footer .copy{max-width:1080px; margin:34px auto 0; padding-top:20px; border-top:
   <div class="wrap">
     <p class="eyebrow">Deployment</p>
     <h2>Where the records live</h2>
-    <p class="sec-lede">Deploy under a <code>_security</code> subdomain (recommended), or at the domain apex as a discovery fallback. Clients should check <code>_security</code> first, then fall back to the apex.</p>
+    <p class="sec-lede">The proposed IETF specification defines <code>_security.example.com</code> as the sole normative owner name. Clients query <code>_security</code>; they do not fall back to the apex or walk toward the DNS root. Per-host HTTP details can still live in that host's <code>/.well-known/security.txt</code> under RFC 9116.</p>
     <div class="deploy-grid">
       <div>
-        <h3><code>_security.example.com</code> <span class="rec">Recommended</span></h3>
+        <h3><code>_security.example.com</code> <span class="rec">Normative</span></h3>
         <p class="pc"><b>Pros:</b> maintains apex zone hygiene, supports future options without cluttering the apex, and follows the established underscored-name convention (<code>_dmarc</code>, <code>_mta-sts</code>, <code>_bimi</code>) per RFC 8552.</p>
         <p class="pc"><b>Cons:</b> less visible than the apex, and users need to know about the <code>_security</code> subdomain.</p>
         <div class="tbl-wrap"><table>
@@ -232,21 +241,14 @@ footer .copy{max-width:1080px; margin:34px auto 0; padding-top:20px; border-top:
             <tr><td>Direct email contact</td><td>TXT</td><td><code>security_contact=mailto:security@example.com</code></td></tr>
             <tr><td>Direct web form contact</td><td>TXT</td><td><code>security_contact=https://example.com/report</code></td></tr>
             <tr><td>Policy URL</td><td>TXT</td><td><code>security_policy=https://example.com/security-policy</code></td></tr>
+            <tr><td>Expiration timestamp</td><td>TXT</td><td><code>security_expires=2027-01-01T00:00:00Z</code></td></tr>
           </tbody>
         </table></div>
       </div>
       <div>
-        <h3>Apex <code>example.com</code></h3>
-        <p class="pc"><b>Pros:</b> obvious and familiar, easy to find, resilient, and carries the greatest authority on behalf of the domain and its owner.</p>
-        <p class="pc"><b>Cons:</b> adds TXT records to the apex, and is less conducive to additional future options.</p>
-        <div class="tbl-wrap"><table>
-          <thead><tr><th>Description</th><th>Type</th><th>Content</th></tr></thead>
-          <tbody>
-            <tr><td>Direct email contact</td><td>TXT</td><td><code>security_contact=mailto:security@example.com</code></td></tr>
-            <tr><td>Direct web form contact</td><td>TXT</td><td><code>security_contact=https://example.com/report</code></td></tr>
-            <tr><td>Policy URL</td><td>TXT</td><td><code>security_policy=https://example.com/security-policy</code></td></tr>
-          </tbody>
-        </table></div>
+        <h3>Legacy apex deployments</h3>
+        <p class="pc">The 2021 proposal allowed apex records as a discovery fallback. The proposed IETF specification removes that behavior, because apex TXT record sets commonly contain unrelated protocols and do not provide explicit scoping.</p>
+        <p class="pc"><b>Migrating?</b> Add <code>security_expires</code>, copy all DNS Security TXT records to <code>_security</code>, and remove the apex copies after an appropriate transition period. Clients may offer an explicitly labeled legacy mode, but it should not be enabled by default.</p>
       </div>
     </div>
   </div>
@@ -272,12 +274,12 @@ footer .copy{max-width:1080px; margin:34px auto 0; padding-top:20px; border-top:
         <div class="rec">_security.fortinet.com TXT "security_contact=https://www.fortiguard.com/faq/psirt-contact"</div>
       </div>
       <div class="adopter">
-        <div><div class="org">starlingbank.com</div><div class="who">Licensed UK retail bank</div></div>
-        <div class="rec">starlingbank.com TXT "security_contact=mailto:disclosure@starlingbank.com"</div>
+        <div><div class="org">a16z.com</div><div class="who">Andreessen Horowitz</div></div>
+        <div class="rec">_security.a16z.com TXT "security_contact=mailto:cirt@a16z.com"</div>
       </div>
       <div class="adopter">
-        <div><div class="org">raspberrypi.org</div><div class="who">The Raspberry Pi Foundation</div></div>
-        <div class="rec">raspberrypi.org TXT "security_policy=https://www.raspberrypi.org/contact/security/"</div>
+        <div><div class="org">shodan.io</div><div class="who">The Shodan search engine</div></div>
+        <div class="rec">_security.shodan.io TXT "security_contact=mailto:security@shodan.io"</div>
       </div>
     </div>
     <p class="wild-note">Resolve any domain's security contact yourself at <a href="https://lookup.disclose.io">lookup.disclose.io</a>.</p>
@@ -293,8 +295,14 @@ footer .copy{max-width:1080px; margin:34px auto 0; padding-top:20px; border-top:
       <div class="qa">
         <div class="q">Is this a replacement for security.txt?</div>
         <div class="a">
-          <p>It can be, but it doesn't need to be. security.txt works well for individual hosts or hosts only addressable by IP, with DNS Security TXT providing directions from the parent domain.</p>
-          <p>If a DNS record and a security.txt file disagree, the source with the stronger authentication is more authoritative: a compliant security.txt is served over HTTPS and authenticated by the web server's TLS certificate (RFC 9116), while a DNS record is cryptographically authenticated only when the zone is signed with DNSSEC. Where both are equally authenticated, the host-level security.txt is the more specific source for that host, and the DNS record speaks for the domain as a whole. Keep them consistent.</p>
+          <p>It can be, but it doesn't need to be. security.txt works well for individual hosts or hosts only addressable by IP, with DNS Security TXT providing directions from the parent domain. The two mechanisms have different scopes and authentication properties: security.txt can describe a specific HTTP service, while DNS Security TXT provides information for a selected reference domain.</p>
+          <p>If valid results disagree, clients should present all applicable contact information and highlight the inconsistency rather than applying a universal precedence rule. Publishers should keep both mechanisms consistent. A DNS record in an unsigned zone remains useful for discovery but is not cryptographically authenticated, and a DNSSEC result of Bogus must not be used.</p>
+        </div>
+      </div>
+      <div class="qa">
+        <div class="q">Why is security_expires required?</div>
+        <div class="a">
+          <p>Stale contact information can misdirect sensitive vulnerability reports or cause them to be lost entirely. The field follows the freshness model of RFC 9116: it appears exactly once, uses an RFC 3339 timestamp, and marks the point after which the entire record set must not be used. Clients check the timestamp whenever they use cached information, and a longer DNS TTL cannot extend it.</p>
         </div>
       </div>
       <div class="qa">
@@ -353,7 +361,7 @@ footer .copy{max-width:1080px; margin:34px auto 0; padding-top:20px; border-top:
       <a class="fl" href="https://disclose.io">disclose.io</a>
     </div>
   </div>
-  <div class="copy">Created with care by John Carroll and Casey Ellis for the disclose.io Project. Copyright 2018 to 2026 disclose.io.</div>
+  <div class="copy">Created with &lt;3 by John Carroll and Casey Ellis for the disclose.io Project. Copyright 2018 to 2026 disclose.io.</div>
 </footer>
 
 </body>
