@@ -76,6 +76,9 @@ p{margin:0 0 14px;} p:last-child{margin-bottom:0;}
 
 /* deploy */
 .rec{background:var(--bg-tint); border:1px solid var(--bg-deep); border-radius:8px; padding:2px 9px; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent-deep);}
+.callout{background:var(--bg-tint); border:1px solid var(--bg-deep); border-left:4px solid var(--accent); border-radius:12px; padding:16px 20px; margin:0 0 26px; font-size:14.5px; line-height:1.55; color:var(--ink);}
+.callout b{color:var(--accent-deep);}
+.callout .ct{display:block; font-weight:700; color:var(--accent-deep); margin-bottom:4px;}
 .deploy-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:8px;}
 .pc{font-size:14px; color:var(--muted); margin:8px 0;} .pc b{color:var(--ink);}
 .tbl-wrap{overflow-x:auto; margin-top:14px; border:1px solid var(--line); border-radius:12px;}
@@ -175,7 +178,7 @@ footer .copy{max-width:1080px; margin:34px auto 0; padding-top:20px; border-top:
     <div class="cards">
       <div class="card">
         <h3>Authoritative</h3>
-        <p>Using DNS TXT to establish authorization from a domain is common practice. DNS records speak for the organization, not just an individual server or app owner, which creates confidence in the reporting and policy information they carry.</p>
+        <p>Using DNS TXT to establish authorization from a domain is common practice. DNS records speak for the organization, not just an individual server or app owner, which creates confidence in the reporting and policy information they carry. A DNS Security TXT record does not itself authorize testing; authorization or safe-harbor terms must be stated explicitly in the linked policy.</p>
       </div>
       <div class="card">
         <h3>Centralized</h3>
@@ -230,6 +233,10 @@ footer .copy{max-width:1080px; margin:34px auto 0; padding-top:20px; border-top:
     <p class="eyebrow">Deployment</p>
     <h2>Where the records live</h2>
     <p class="sec-lede">The proposed IETF specification defines <code>_security.example.com</code> as the sole normative owner name. Clients query <code>_security</code>; they do not fall back to the apex or walk toward the DNS root. Per-host HTTP details can still live in that host's <code>/.well-known/security.txt</code> under RFC 9116.</p>
+    <div class="callout">
+      <span class="ct">Already publishing at the apex?</span>
+      You are in good company: many early adopters put their record at the domain apex under the 2021 proposal, and those records still resolve today. Nothing breaks. When you are ready, move to <code>_security</code> at your own pace: add <code>security_expires</code>, copy your records to <code>_security.yourdomain</code>, and retire the apex copies after a transition period.
+    </div>
     <div class="deploy-grid">
       <div>
         <h3><code>_security.example.com</code> <span class="rec">Normative</span></h3>
