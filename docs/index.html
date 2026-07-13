@@ -106,6 +106,34 @@ td code{white-space:nowrap;}
 .adopter .rec{background:var(--bg-tint); border-radius:8px; padding:9px 12px; font-family:var(--mono); font-size:12.5px; color:var(--accent-deep); overflow-x:auto; white-space:nowrap;}
 .wild-note{font-size:14px; color:var(--muted); margin-top:20px;}
 
+/* generator */
+.gen-grid{display:grid; grid-template-columns:1fr 1.2fr; gap:22px; margin-top:8px; align-items:start;}
+.gen-grid>*{min-width:0;}
+.gen-form{background:#fff; border:1px solid var(--line); border-radius:16px; padding:22px 24px;}
+.gen-form label{display:block; font-size:13px; font-weight:700; margin:16px 0 6px;}
+.gen-form label:first-of-type{margin-top:0;}
+.gen-form label .tag{margin-left:6px;}
+.gen-form input{width:100%; font:inherit; font-size:14.5px; padding:10px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink);}
+.gen-form input:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--bg-deep);}
+.gen-form .hint{font-size:12.5px; color:var(--muted); margin:5px 0 0;}
+.gen-row{display:flex; gap:8px; margin-top:8px;}
+.gen-row:first-of-type{margin-top:0;}
+.gen-row .rm{flex:0 0 auto; font:inherit; font-size:13px; font-weight:700; color:var(--muted); background:transparent; border:1.5px solid var(--line); border-radius:10px; padding:0 13px; cursor:pointer;}
+.gen-row .rm:hover{color:var(--accent); border-color:var(--accent);}
+.gen-add{display:inline-flex; font:inherit; font-size:13px; font-weight:700; color:var(--accent); background:transparent; border:1.5px solid var(--accent); border-radius:10px; padding:7px 14px; margin-top:10px; cursor:pointer;}
+.gen-add:hover{background:var(--bg-tint);}
+.gen-warn{display:none; background:#fffbeb; border:1px solid #fde68a; border-radius:10px; color:#92400e; font-size:13px; padding:10px 13px; margin-top:10px;}
+.gen-warn.on{display:block;}
+.gen-out .blk{background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px 22px; margin-bottom:16px;}
+.gen-out .blk:last-child{margin-bottom:0;}
+.gen-out .bh{display:flex; align-items:center; gap:12px; margin-bottom:4px;}
+.gen-out .bh h3{margin:0; flex:1;}
+.gen-out .note{font-size:12.5px; color:var(--muted); margin:0 0 4px;}
+.gen-out pre{background:var(--bg-tint); border:1px solid var(--bg-deep); border-radius:10px; padding:13px 15px; font-family:var(--mono); font-size:12.5px; line-height:1.75; color:var(--accent-deep); overflow-x:auto; margin-top:10px;}
+.copy-btn{flex:0 0 auto; font:inherit; font-size:12.5px; font-weight:700; color:var(--accent); background:var(--bg-tint); border:1px solid var(--bg-deep); border-radius:8px; padding:5px 12px; cursor:pointer;}
+.copy-btn:hover{background:var(--bg-deep);}
+.copy-btn.did{color:#166534; background:#f0fdf4; border-color:#bbf7d0;}
+
 /* faq */
 .faq{display:grid; gap:12px; margin-top:8px;}
 .qa{background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 22px;}
@@ -126,6 +154,7 @@ footer .copy{max-width:1080px; margin:34px auto 0; padding-top:20px; border-top:
 @media (max-width:760px){
   .cards{grid-template-columns:1fr;}
   .deploy-grid{grid-template-columns:1fr;}
+  .gen-grid{grid-template-columns:1fr;}
   .adopter{grid-template-columns:1fr; gap:8px;}
   footer .wrap{grid-template-columns:1fr; gap:24px;}
   .nav .links{display:none;}
@@ -145,6 +174,7 @@ footer .copy{max-width:1080px; margin:34px auto 0; padding-top:20px; border-top:
       <a href="#summary">The standard</a>
       <a href="#fields">Fields</a>
       <a href="#deploy">Deploy</a>
+      <a href="#generator">Generator</a>
       <a href="#wild">In the wild</a>
       <a href="#faq">FAQ</a>
       <a href="https://github.com/disclose/dnssecuritytxt">GitHub</a>
@@ -272,8 +302,203 @@ footer .copy{max-width:1080px; margin:34px auto 0; padding-top:20px; border-top:
   </div>
 </section>
 
+<!-- GENERATOR -->
+<section id="generator" class="alt">
+  <div class="wrap">
+    <p class="eyebrow">Generator</p>
+    <h2>Generate your records</h2>
+    <p class="sec-lede">Fill in your details and copy the records straight into your DNS provider. Everything runs in your browser; nothing you type leaves this page.</p>
+    <div class="gen-grid">
+      <div class="gen-form">
+        <label for="g-domain">Domain</label>
+        <input id="g-domain" type="text" placeholder="example.com" autocomplete="off" spellcheck="false" autocapitalize="off">
+        <p class="hint">Records are published at <code>_security</code> under this name. Subdomains work too.</p>
+
+        <label for="g-contact-0">Security contact <span class="tag req">Required</span></label>
+        <div id="g-contacts">
+          <div class="gen-row"><input id="g-contact-0" type="text" placeholder="security@example.com" autocomplete="off" spellcheck="false" autocapitalize="off"></div>
+        </div>
+        <button id="g-add" type="button" class="gen-add">+ Add another contact</button>
+        <p class="hint">An email address or a web form URL. Bare emails get <code>mailto:</code>, bare URLs get <code>https://</code>. Each extra contact becomes its own record.</p>
+
+        <label for="g-policy">Security policy <span class="tag opt">Optional</span></label>
+        <input id="g-policy" type="text" placeholder="https://example.com/security-policy" autocomplete="off" spellcheck="false" autocapitalize="off">
+        <p class="hint">A link to your disclosure policy. Need one? Start with the <a href="https://github.com/disclose/dioterms">disclose.io dioterms</a> boilerplates.</p>
+
+        <label for="g-expires">Expires <span class="tag req">Required</span></label>
+        <input id="g-expires" type="date">
+        <p class="hint">Published as an RFC 3339 timestamp at 00:00:00 UTC. Keep it under a year out, and refresh it when you review the records.</p>
+
+        <div id="g-warn" class="gen-warn" role="alert"></div>
+      </div>
+
+      <div class="gen-out">
+        <div class="blk">
+          <div class="bh"><h3>DNS provider console</h3><button class="copy-btn" id="g-copy-values" type="button">Copy</button></div>
+          <p class="note">Name is usually entered relative; some consoles want the fully qualified <code id="g-fqdn">_security.example.com</code>.</p>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Name</th><th>Type</th><th>Content</th></tr></thead>
+            <tbody id="g-rows"></tbody>
+          </table></div>
+        </div>
+        <div class="blk">
+          <div class="bh"><h3>BIND zone file</h3><button class="copy-btn" id="g-copy-bind" type="button">Copy</button></div>
+          <pre id="g-bind"></pre>
+        </div>
+        <div class="blk">
+          <div class="bh"><h3>Verify it</h3><button class="copy-btn" id="g-copy-dig" type="button">Copy</button></div>
+          <pre id="g-dig"></pre>
+          <p class="hint" style="margin-top:8px">Once the records have propagated, this returns every value you published.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var domainEl=$("g-domain"), policyEl=$("g-policy"), expEl=$("g-expires"),
+      contactsEl=$("g-contacts"), warnEl=$("g-warn"), rowsEl=$("g-rows"),
+      bindEl=$("g-bind"), digEl=$("g-dig"), fqdnEl=$("g-fqdn");
+  var DAY=86400000, touched=false;
+
+  function pad(n){ return (n<10?"0":"")+n; }
+  function isoDate(d){ return d.getUTCFullYear()+"-"+pad(d.getUTCMonth()+1)+"-"+pad(d.getUTCDate()); }
+  expEl.value = isoDate(new Date(Date.now()+364*DAY));
+
+  function cleanDomain(v){
+    v=v.trim().toLowerCase();
+    v=v.replace(/^[a-z][a-z0-9+.-]*:\/\//,"");
+    v=v.split("/")[0].split("?")[0].split("#")[0];
+    v=v.replace(/:\d+$/,"").replace(/\.$/,"");
+    return v.replace(/[^a-z0-9.-]/g,"");
+  }
+  function cleanValue(v){ return v.replace(/["\s]/g,""); }
+  function normContact(v){
+    v=cleanValue(v);
+    if(!v) return "";
+    if(/^(mailto:|https?:\/\/)/i.test(v)) return v;
+    if(/^[^@\/]+@[^@\/]+\.[^@\/]+$/.test(v)) return "mailto:"+v;
+    return "https://"+v;
+  }
+  function normPolicy(v){
+    v=cleanValue(v);
+    if(!v) return "";
+    if(/^https?:\/\//i.test(v)) return v;
+    return "https://"+v;
+  }
+  function contactValues(){
+    var out=[], inputs=contactsEl.querySelectorAll("input"), i, c;
+    for(i=0;i<inputs.length;i++){ c=normContact(inputs[i].value); if(c) out.push(c); }
+    return out;
+  }
+
+  function render(){
+    var domain, contacts, policy;
+    if(touched){
+      domain = cleanDomain(domainEl.value) || "example.com";
+      contacts = contactValues();
+      policy = normPolicy(policyEl.value);
+    } else {
+      domain = "example.com";
+      contacts = ["mailto:security@example.com"];
+      policy = "https://example.com/security-policy";
+    }
+    var owner = "_security."+domain;
+    var expires = expEl.value ? expEl.value+"T00:00:00Z" : "";
+
+    var warns=[];
+    if(touched && contacts.length===0) warns.push("security_contact is required. Add at least one reporting channel.");
+    if(!expEl.value){ warns.push("security_expires is required. Pick a date."); }
+    else {
+      var t=Date.parse(expires);
+      if(!(t>Date.now())) warns.push("security_expires must be in the future.");
+      else if(t>Date.now()+365*DAY) warns.push("Keep security_expires under one year out, consistent with RFC 9116.");
+    }
+    warnEl.textContent = warns.join(" ");
+    warnEl.classList.toggle("on", warns.length>0);
+
+    var recs=[], i;
+    for(i=0;i<contacts.length;i++) recs.push("security_contact="+contacts[i]);
+    if(policy) recs.push("security_policy="+policy);
+    if(expires) recs.push("security_expires="+expires);
+
+    fqdnEl.textContent = owner;
+    rowsEl.textContent = "";
+    for(i=0;i<recs.length;i++){
+      var tr=document.createElement("tr");
+      var name=document.createElement("td"); var nc=document.createElement("code"); nc.textContent="_security"; name.appendChild(nc);
+      var type=document.createElement("td"); type.textContent="TXT";
+      var val=document.createElement("td"); var vc=document.createElement("code"); vc.textContent=recs[i]; vc.style.whiteSpace="normal"; val.appendChild(vc);
+      tr.appendChild(name); tr.appendChild(type); tr.appendChild(val);
+      rowsEl.appendChild(tr);
+    }
+    var bind=[];
+    for(i=0;i<recs.length;i++) bind.push(owner+".  300  IN  TXT  \""+recs[i]+"\"");
+    bindEl.textContent = bind.join("\n");
+    digEl.textContent = "dig +short TXT "+owner;
+  }
+
+  function onInput(){ touched=true; render(); }
+
+  function makeRow(){
+    var row=document.createElement("div"); row.className="gen-row";
+    var inp=document.createElement("input");
+    inp.type="text"; inp.placeholder="https://example.com/report";
+    inp.autocomplete="off"; inp.spellcheck=false;
+    inp.setAttribute("aria-label","Additional security contact");
+    var rm=document.createElement("button");
+    rm.type="button"; rm.className="rm"; rm.textContent="Remove";
+    rm.setAttribute("aria-label","Remove this contact");
+    rm.addEventListener("click", function(){ row.remove(); touched=true; render(); });
+    row.appendChild(inp); row.appendChild(rm);
+    contactsEl.appendChild(row); inp.focus();
+  }
+  $("g-add").addEventListener("click", makeRow);
+
+  function wireCopy(btnId, getText){
+    var btn=$(btnId);
+    btn.addEventListener("click", function(){
+      var text=getText();
+      function ok(){
+        btn.textContent="Copied"; btn.classList.add("did");
+        setTimeout(function(){ btn.textContent="Copy"; btn.classList.remove("did"); },1600);
+      }
+      function fallback(){
+        var t=document.createElement("textarea");
+        t.value=text; t.style.position="fixed"; t.style.opacity="0";
+        document.body.appendChild(t); t.select();
+        try{ if(document.execCommand("copy")) ok(); }catch(e){}
+        document.body.removeChild(t);
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(ok, fallback);
+      } else { fallback(); }
+    });
+  }
+  function tableValues(){
+    var out=[], codes=rowsEl.querySelectorAll("td:last-child code"), i;
+    for(i=0;i<codes.length;i++) out.push(codes[i].textContent);
+    return out.join("\n");
+  }
+  wireCopy("g-copy-values", tableValues);
+  wireCopy("g-copy-bind", function(){ return bindEl.textContent; });
+  wireCopy("g-copy-dig", function(){ return digEl.textContent; });
+
+  domainEl.addEventListener("input", onInput);
+  contactsEl.addEventListener("input", onInput);
+  policyEl.addEventListener("input", onInput);
+  expEl.addEventListener("input", onInput);
+  expEl.addEventListener("change", onInput);
+
+  render();
+})();
+</script>
+
 <!-- IN THE WILD -->
-<section id="wild" class="alt">
+<section id="wild">
   <div class="wrap">
     <p class="eyebrow">In the wild</p>
     <h2>Organizations publishing it today</h2>
@@ -309,7 +534,7 @@ footer .copy{max-width:1080px; margin:34px auto 0; padding-top:20px; border-top:
 </section>
 
 <!-- FAQ -->
-<section id="faq">
+<section id="faq" class="alt">
   <div class="wrap">
     <p class="eyebrow">FAQ</p>
     <h2>Frequently asked questions</h2>
