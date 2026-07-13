@@ -1,0 +1,560 @@
+
+
+
+
+Domain Name System Operations                                   C. Ellis
+Internet-Draft                                                J. Carroll
+Intended status: Standards Track                 The disclose.io Project
+Expires: 13 January 2027                                    12 July 2026
+
+
+  Discovering Security Contact and Policy Information Using the Domain
+                           Name System (DNS)
+                  draft-ellis-dns-security-contact-00
+
+Abstract
+
+   Organizations need a simple way to publish contact points for reports
+   about security vulnerabilities and links to the policies that govern
+   those reports.  This document defines a DNS-based discovery mechanism
+   that uses TXT records at the underscored owner name _security.
+   Records include an expiration timestamp so that stale contact
+   information is not used indefinitely.  The mechanism provides a
+   domain-scoped complement to the host-specific security.txt mechanism
+   defined by RFC 9116.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 13 January 2027.
+
+Copyright Notice
+
+   Copyright (c) 2026 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+
+
+
+Ellis & Carroll          Expires 13 January 2027                [Page 1]
+
+Internet-Draft       DNS Security Contact Discovery            July 2026
+
+
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   3
+   3.  Publication . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     3.1.  Owner Name  . . . . . . . . . . . . . . . . . . . . . . .   3
+     3.2.  Record Format . . . . . . . . . . . . . . . . . . . . . .   3
+     3.3.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .   4
+   4.  Discovery and Processing  . . . . . . . . . . . . . . . . . .   5
+   5.  Relationship to security.txt  . . . . . . . . . . . . . . . .   6
+   6.  Operational Considerations  . . . . . . . . . . . . . . . . .   6
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+   8.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .   7
+   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
+   10. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   8
+   11. Implementation Status . . . . . . . . . . . . . . . . . . . .   8
+   12. Normative References  . . . . . . . . . . . . . . . . . . . .   8
+   13. Informative References  . . . . . . . . . . . . . . . . . . .   9
+   Appendix A.  Legacy Deployment and Migration  . . . . . . . . . .   9
+   Appendix B.  Change Log . . . . . . . . . . . . . . . . . . . . .  10
+     B.1.  Since the 2021 Web Proposal . . . . . . . . . . . . . . .  10
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  10
+
+1.  Introduction
+
+   People who discover security vulnerabilities often have difficulty
+   identifying the correct reporting channel and the policy that applies
+   to a system.  [RFC9116] addresses this problem for HTTP services by
+   defining a file at a well-known URI.  A DNS-based mechanism is useful
+   when a domain operator wants to publish an organization-wide default,
+   when the affected service is not an HTTP service, or when discovery
+   is performed before connecting to a service.
+
+   This document defines three TXT record forms for publishing security
+   contact URIs, security policy URIs, and the time after which the
+   information is stale.  It does not define a vulnerability reporting
+   protocol, authorize security testing, or replace service-specific
+   contact information.
+
+
+
+
+
+
+
+
+
+Ellis & Carroll          Expires 13 January 2027                [Page 2]
+
+Internet-Draft       DNS Security Contact Discovery            July 2026
+
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+   Reference Domain:  The domain name for which an application is
+      attempting to discover security information.  Selection of the
+      Reference Domain is application-specific and is outside the scope
+      of this document.
+
+   Security TXT RRset:  The IN-class TXT RRset whose owner name is
+      formed by prepending the label _security to the Reference Domain.
+
+   Logical TXT Record:  The octet sequence obtained by concatenating, in
+      order and without added whitespace, all character-strings in the
+      RDATA of one TXT resource record.
+
+3.  Publication
+
+3.1.  Owner Name
+
+   For a Reference Domain of example.com, records conforming to this
+   specification MUST be published in an IN TXT RRset at:
+
+   _security.example.com.
+
+   The _security label scopes the TXT RRset according to [RFC8552].
+   Publishing the records at the zone apex is not part of this
+   specification; migration from early, pre-standard deployments is
+   discussed in Appendix A.
+
+3.2.  Record Format
+
+   Each Logical TXT Record defined by this specification contains one
+   field name, an equals sign ("="), and one field value.  Field names
+   are case-insensitive.  No whitespace is permitted before or after the
+   equals sign.  The following ABNF [RFC5234] defines the record forms:
+
+   record          = contact-record / policy-record / expires-record
+   contact-record  = "security_contact=" URI
+   policy-record   = "security_policy=" URI
+   expires-record  = "security_expires=" date-time
+   URI             = <URI as defined in Section 3 of RFC 3986>
+   date-time       = <date-time as defined in Section 5.6 of RFC 3339>
+
+
+
+
+Ellis & Carroll          Expires 13 January 2027                [Page 3]
+
+Internet-Draft       DNS Security Contact Discovery            July 2026
+
+
+   A URI field value MUST be an absolute URI as defined by [RFC3986] and
+   MUST contain no fragment component.  A publisher MUST publish at
+   least one security_contact record.  A publisher MAY publish multiple
+   contact records and multiple policy records.  Because resource
+   records within an RRset are unordered, publishers MUST NOT use record
+   order to express preference.
+
+   A security_contact URI identifies a channel through which security
+   reports can be initiated.  Publishers MUST support contact by each
+   URI they publish.  Publishers SHOULD use an https URI, a mailto URI,
+   or both.  Consumers MUST support the https and mailto schemes and MAY
+   support other schemes.
+
+   A security_policy URI identifies a human-readable vulnerability
+   disclosure or security research policy.  Its scheme MUST be https.
+
+   A publisher MUST publish exactly one security_expires record.  Its
+   value indicates the date and time after which the entire Security TXT
+   RRset is considered stale and MUST NOT be used.  The value MUST be a
+   date-time conforming to [RFC3339] and MUST express Coordinated
+   Universal Time using the Z suffix.  The timestamp MUST be later than
+   the time of publication.  Publishers SHOULD choose a timestamp less
+   than one year in the future, consistent with the freshness guidance
+   in [RFC9116].
+
+   TXT RDATA consists of one or more character-strings, each of which is
+   limited to 255 octets by [RFC1035].  Publishers SHOULD encode each
+   Logical TXT Record as a single character-string of no more than 255
+   octets.  Consumers MUST correctly concatenate multiple character-
+   strings before parsing.  Consumers MUST support Logical TXT Records
+   of at least 2048 octets and MAY reject longer records.
+
+3.3.  Examples
+
+   The following zone-file fragment publishes email and web reporting
+   channels and a vulnerability disclosure policy:
+
+   _security.example.com. 3600 IN TXT
+     "security_contact=mailto:security@example.com"
+   _security.example.com. 3600 IN TXT
+     "security_contact=https://example.com/report-security-issue"
+   _security.example.com. 3600 IN TXT
+     "security_policy=https://example.com/security"
+   _security.example.com. 3600 IN TXT
+     "security_expires=2027-01-01T00:00:00Z"
+
+   A policy operated by a third party is also permitted:
+
+
+
+
+Ellis & Carroll          Expires 13 January 2027                [Page 4]
+
+Internet-Draft       DNS Security Contact Discovery            July 2026
+
+
+   _security.example.net. 3600 IN TXT
+     "security_contact=https://reports.example.test/example.net"
+   _security.example.net. 3600 IN TXT
+     "security_policy=https://policies.example.test/example.net"
+   _security.example.net. 3600 IN TXT
+     "security_expires=2027-01-01T00:00:00Z"
+
+4.  Discovery and Processing
+
+   1.  An application determines a Reference Domain using application-
+       specific information or user input.
+
+   2.  The application constructs the owner name by prepending
+       _security. to the Reference Domain and queries for the IN TXT
+       RRset.
+
+   3.  For each TXT resource record in the answer, the application
+       concatenates its character-strings to form one Logical TXT
+       Record.
+
+   4.  The application processes records whose field name is
+       security_contact, security_policy, or security_expires and
+       ignores TXT records with unrecognized field names.
+
+   5.  The application validates each URI according to Section 3.2.  An
+       invalid record is ignored without invalidating other records in
+       the RRset.
+
+   6.  The application verifies that exactly one security_expires field
+       occurred, that its value is valid, and that the current time is
+       earlier than its value.  Otherwise, discovery fails and none of
+       the RRset's contact or policy information is used.
+
+   If the RRset contains no valid security_contact record, discovery has
+   not succeeded.  A policy URI by itself is not a reporting channel.  A
+   consumer MUST check security_expires each time it uses cached
+   information; the DNS TTL does not extend the stated expiration time.
+
+   A consumer MUST NOT automatically walk toward the DNS root in search
+   of a record unless it has an independently configured administrative
+   boundary.  DNS labels do not reliably identify organizational
+   boundaries, and unrestricted walking could apply a record belonging
+   to a public suffix or an unrelated parent.
+
+
+
+
+
+
+
+
+Ellis & Carroll          Expires 13 January 2027                [Page 5]
+
+Internet-Draft       DNS Security Contact Discovery            July 2026
+
+
+   Normal DNS alias processing applies.  Consumers SHOULD honor DNS TTLs
+   and negative caching.  A DNSSEC validation result of Bogus MUST be
+   treated as a discovery failure; a consumer MUST NOT use the affected
+   data.  Data from an unsigned zone remains useful for discovery but is
+   not cryptographically authenticated.
+
+5.  Relationship to security.txt
+
+   This mechanism complements, rather than replaces, security.txt
+   [RFC9116].  A Security TXT RRset is scoped to its Reference Domain.
+   A security.txt file is scoped according to RFC 9116 and can provide
+   more detailed, service-specific information.
+
+   Publishers SHOULD keep the two mechanisms consistent when both are
+   used.  When valid results differ, consumers SHOULD present all
+   applicable contact information and SHOULD indicate the inconsistency.
+   Consumers MUST NOT infer that either source authorizes security
+   testing.  Authorization, safe-harbor terms, and rules of engagement
+   exist only when explicitly stated by an applicable policy.
+
+6.  Operational Considerations
+
+   Security contact information becomes harmful when it is stale.
+   Publishers SHOULD monitor contact channels, test them periodically,
+   update records before retiring a channel, and refresh
+   security_expires only after confirming that the published contacts
+   and policies remain correct.  Publishers SHOULD use TTLs that permit
+   timely change and SHOULD avoid a TTL that would retain the RRset
+   beyond its stated expiration time.  Third-party reporting services
+   SHOULD be named only with the service provider's agreement.
+
+   Publishers SHOULD keep the RRset small to reduce the likelihood of
+   UDP truncation, fallback to another DNS transport, or amplification.
+   Large policy text, public keys, and instructions do not belong in
+   this RRset; records contain URIs that refer to those resources.
+
+   Organizations with different policies for delegated subdomains MAY
+   publish distinct Security TXT RRsets for those Reference Domains.
+   The existence of a record at a parent does not automatically make it
+   applicable to a child domain; that relationship is determined by the
+   application selecting the Reference Domain.
+
+
+
+
+
+
+
+
+
+
+Ellis & Carroll          Expires 13 January 2027                [Page 6]
+
+Internet-Draft       DNS Security Contact Discovery            July 2026
+
+
+7.  Security Considerations
+
+   An attacker who can alter DNS answers can redirect vulnerability
+   reports, learn that a vulnerability was discovered, collect sensitive
+   technical details, or suppress a legitimate contact.  DNSSEC
+   validation provides origin authentication and integrity for DNS data
+   but does not make a listed contact trustworthy or guarantee that the
+   contact endpoint is uncompromised.  Publishers are therefore
+   RECOMMENDED to sign the relevant zone with DNSSEC, and consumers are
+   RECOMMENDED to perform DNSSEC validation.
+
+   For https URIs, consumers MUST perform normal TLS certificate and
+   hostname validation.  Consumers SHOULD clearly display the
+   destination before transmitting a report, particularly when the URI's
+   authority differs from the Reference Domain.
+
+   A record is not authorization to probe, test, access, or modify
+   systems.  The presence of security_policy only identifies a policy
+   document; consumers and researchers remain responsible for reading it
+   and determining whether it applies.
+
+   DNS responses can be spoofed, replayed until their TTL expires,
+   truncated, or blocked.  Implementations need bounded parsing, URI-
+   length limits, DNSSEC failure handling, and user-visible error
+   reporting.  Consumers MUST NOT treat a DNSSEC Bogus response as
+   equivalent to an unsigned response or to absence of a record.
+
+   The security_expires field limits reliance on stale or replayed data,
+   including data retained outside normal DNS caching.  It is not a
+   substitute for DNSSEC and does not prevent replay before the stated
+   time.  Consumers require a sufficiently accurate clock to evaluate
+   the field and MUST fail discovery when they cannot determine whether
+   the RRset has expired.
+
+   Publishing a mailbox can attract spam and malicious reports.
+   Publishers can instead use an HTTPS form, filtering, or a dedicated
+   reporting platform, but contact mechanisms should not impose barriers
+   that prevent good-faith vulnerability reports.
+
+8.  Privacy Considerations
+
+   DNS queries can reveal that a user or automated tool is seeking a
+   security contact for a domain.  Recursive resolvers, authoritative
+   servers, and on-path observers may be able to associate such queries
+   with a source.  Encrypted DNS transport can reduce disclosure to on-
+   path observers but does not hide the query from the resolver or
+   authoritative server.
+
+
+
+
+Ellis & Carroll          Expires 13 January 2027                [Page 7]
+
+Internet-Draft       DNS Security Contact Discovery            July 2026
+
+
+   Contact URIs are public.  Publishers SHOULD use role accounts or
+   purpose-built endpoints instead of personal addresses.  Consumers
+   SHOULD avoid placing vulnerability details in URI query components
+   because URIs may be logged by DNS-independent intermediaries and HTTP
+   systems.
+
+9.  IANA Considerations
+
+   Per [RFC8552], IANA is requested to add the following entry to the
+   "Underscored and Globally Scoped DNS Node Names" registry:
+
+                 +=========+============+===============+
+                 | RR Type | _NODE NAME | Reference     |
+                 +=========+============+===============+
+                 | TXT     | _security  | This document |
+                 +---------+------------+---------------+
+
+                    Table 1: Underscored DNS Node Name
+                               Registration
+
+10.  Acknowledgements
+
+   This mechanism was first published by the authors as the DNS Security
+   TXT proposal in March 2021 as part of the disclose.io Project.  The
+   authors thank the security researchers, defenders, and vulnerability
+   disclosure practitioners who provided early feedback.
+
+11.  Implementation Status
+
+   This section is to be removed before publishing as an RFC.
+
+   This section is to be completed with known publisher and consumer
+   implementations before working-group adoption.  It is intended to be
+   removed before publication as an RFC.
+
+12.  Normative References
+
+   [RFC1035]  Mockapetris, P., "Domain Names - Implementation and
+              Specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
+              November 1987, <https://www.rfc-editor.org/info/rfc1035>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+
+
+
+
+
+Ellis & Carroll          Expires 13 January 2027                [Page 8]
+
+Internet-Draft       DNS Security Contact Discovery            July 2026
+
+
+   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): Generic Syntax", STD 66,
+              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+              <https://www.rfc-editor.org/info/rfc3986>.
+
+   [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
+              Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
+              <https://www.rfc-editor.org/info/rfc3339>.
+
+   [RFC5234]  Crocker, D. and P. Overell, "Augmented BNF for Syntax
+              Specifications: ABNF", STD 68, RFC 5234,
+              DOI 10.17487/RFC5234, January 2008,
+              <https://www.rfc-editor.org/info/rfc5234>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [RFC8552]  Crocker, D., "Scoped Interpretation of DNS Resource
+              Records through "Underscored" Naming of Attribute Leaves",
+              BCP 222, RFC 8552, DOI 10.17487/RFC8552, March 2019,
+              <https://www.rfc-editor.org/info/rfc8552>.
+
+13.  Informative References
+
+   [RFC9116]  Foudil, E. and Y. Shafranovich, "A File Format to Aid in
+              Security Vulnerability Disclosure", RFC 9116,
+              DOI 10.17487/RFC9116, April 2022,
+              <https://www.rfc-editor.org/info/rfc9116>.
+
+Appendix A.  Legacy Deployment and Migration
+
+   The 2021 pre-standard DNS Security TXT proposal permitted records at
+   either _security.example.com or the domain apex and suggested that
+   consumers use the apex as a fallback.  This specification removes the
+   apex fallback because apex TXT RRsets commonly contain unrelated
+   records, the fallback complicates negative caching and authentication
+   decisions, and the underscored name provides explicit protocol
+   scoping.
+
+   Operators of pre-standard deployments SHOULD add a security_expires
+   record, copy all records to _security, and then remove the apex
+   copies after an appropriate transition period.  Consumers MAY provide
+   an explicitly labeled legacy mode that reads security_contact and
+   security_policy records from the apex, but legacy mode is outside the
+   interoperability requirements of this specification and SHOULD NOT be
+   enabled by default.  Consumers MUST NOT synthesize an expiration time
+   for normative _security deployments that omit security_expires.
+
+
+
+Ellis & Carroll          Expires 13 January 2027                [Page 9]
+
+Internet-Draft       DNS Security Contact Discovery            July 2026
+
+
+Appendix B.  Change Log
+
+   This section is to be removed before publishing as an RFC.
+
+B.1.  Since the 2021 Web Proposal
+
+   *  Defined a single normative owner name, _security, and requested
+      its IANA registration.
+
+   *  Removed apex fallback from the normative discovery algorithm.
+
+   *  Defined parsing, URI validation, DNSSEC failure handling, size
+      limits, and administrative-boundary behavior.
+
+   *  Added the required security_expires field, using RFC 3339 UTC
+      timestamps and freshness semantics aligned with RFC 9116.
+
+   *  Clarified the relationship with RFC 9116 and that publication does
+      not authorize security testing.
+
+   *  Added operational, security, and privacy considerations.
+
+Authors' Addresses
+
+   Casey Ellis
+   The disclose.io Project
+   URI:   https://disclose.io/
+
+
+   John Carroll
+   The disclose.io Project
+   URI:   https://disclose.io/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ellis & Carroll          Expires 13 January 2027               [Page 10]

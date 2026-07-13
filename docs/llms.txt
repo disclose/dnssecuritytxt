@@ -2,12 +2,12 @@
 
 > Proposed DNS-based standard for nominating security contact points and policies via TXT records.
 
-A draft standardization effort under the disclose.io project, currently being prepared for IETF submission. The proposal extends the principles behind security.txt (RFC 9116) to the DNS layer, so organizations can publish security contacts and policies without requiring an HTTP server on the asset being queried.
+A draft standardization effort under the disclose.io project, currently being prepared for IETF submission. The proposal extends the principles behind security.txt (RFC 9116) to the DNS layer, so organizations can publish security contacts, policies, and an explicit expiration time without requiring an HTTP server on the asset being queried.
 
 ## Status
 
 - **Proposal first published:** March 25, 2021
-- **Current state:** IETF draft preparation (`draft-ellis-dns-security-txt-00`)
+- **Current state:** IETF draft preparation (`draft-ellis-dns-security-contact-00`)
 - **Authors:** John Carroll, Casey Ellis
 - **Sponsor:** The disclose.io Project
 
@@ -18,6 +18,13 @@ A draft standardization effort under the disclose.io project, currently being pr
 - **Issues / feedback:** https://github.com/disclose/dnssecuritytxt/issues
 - **Twitter:** https://twitter.com/dnssecuritytxt
 - **Parent project:** https://disclose.io
+- **Draft source:** https://github.com/disclose/dnssecuritytxt/blob/main/ietf/draft-ellis-dns-security-contact-00.xml
+
+## Record fields
+
+- `security_contact=URI` — required one or more times
+- `security_policy=URI` — optional
+- `security_expires=date-time` — required exactly once; RFC 3339 UTC timestamp applying to the entire RRset
 
 ## Related standards
 

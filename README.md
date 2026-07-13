@@ -23,6 +23,17 @@
 
 > This proposal was first made public on March 25, 2021 and is currently a draft. We welcome comments and feedback! To make suggestions please submit a PR via Github or [submit a ticket](https://github.com/disclose/dnssecuritytxt/issues). Thanks for your interest!  
 
+## IETF Internet-Draft
+
+The proposed Standards Track Internet-Draft is maintained in [`ietf/`](ietf/):
+
+- [RFCXML source](ietf/draft-ellis-dns-security-contact-00.xml)
+- [Rendered text](ietf/draft-ellis-dns-security-contact-00.txt)
+- [Rendered HTML](ietf/draft-ellis-dns-security-contact-00.html)
+- [Submission and review notes](ietf/SUBMISSION-NOTES.md)
+
+The draft makes `_security.<domain>` the normative owner name, requires an RFC 3339 `security_expires` timestamp, and requests registration of the `_security` TXT node name under RFC 8552.
+
 Find us on Twitter: [https://twitter.com/dnssecuritytxt](https://twitter.com/dnssecuritytxt).  
 
 Created with <3 by [John Carroll](https://twitter.com/yosignals) and [Casey Ellis](https://twitter.com/caseyjohnellis) for [The disclose.io Project](https://disclose.io).
